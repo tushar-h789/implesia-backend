@@ -37,6 +37,7 @@ These slugs already exist. Use them for Get / List / Patch:
 | Pricing models | `MODEL_SLUG=discovery-sprint` |
 | Pricing packages | `PACKAGE_SLUG=product-landing-page` |
 | Portfolio | `PROJECT_SLUG=gulf-franchise` |
+| Articles | `ARTICLE_SLUG=zero-trust-modern-saas` |
 | Orders | `ORDER_ID` from Submit Order |
 | Leads | `LEAD_ID` from a public lead submit |
 
@@ -50,6 +51,7 @@ Create requests write a **bruno-demo-*** slug. Delete requests target only those
 | Pricing → Create Model (`bruno-demo-model`) | Pricing → Delete Model |
 | Pricing → Create Package (`bruno-demo-package`) | Pricing → Delete Package |
 | Portfolio → Create Project (`bruno-demo-case`) | Portfolio → Delete Project |
+| Articles → Create Post (`bruno-demo-insight`) | Articles → Delete Post |
 
 Do not run Delete Service after an order exists for that service (API returns `409`).
 

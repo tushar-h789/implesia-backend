@@ -1,0 +1,23 @@
+meta {
+  name: Update Post
+  type: http
+  seq: 6
+}
+
+patch {
+  url: {{PRIVATE_BASE_URL}}/api/v1/admin/articles/posts/{{ARTICLE_SLUG}}
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "is_published": true,
+    "reading_minutes": 18
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

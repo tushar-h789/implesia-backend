@@ -1,0 +1,43 @@
+meta {
+  name: Create Post
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{PRIVATE_BASE_URL}}/api/v1/admin/articles/posts
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "title": "Bruno Demo Insight",
+    "slug": "bruno-demo-insight",
+    "excerpt": "Created from Bruno to prove admin can store a full article, including a private internal note.",
+    "body": "This demo post exists so you can exercise Create and Delete without touching the live catalogue. It should never stay in production.",
+    "topic": "architecture",
+    "topic_label": "Architecture",
+    "tags": ["bruno", "demo"],
+    "author_name": "Implesia Engineering",
+    "author_role": "Editorial",
+    "reading_minutes": 5,
+    "published_at": "2026-09-19T00:00:00Z",
+    "is_featured": false,
+    "is_published": true,
+    "sort_order": 999,
+    "internal_notes": "Private note — never returned on public routes."
+  }
+}
+
+script:post-response {
+  const body = res.getBody();
+  if (res.getStatus() === 201 && body.slug) {
+    bru.setEnvVar("ARTICLE_SLUG", body.slug);
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

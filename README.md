@@ -2,7 +2,7 @@
 
 FastAPI backend for the [implesia.com](https://implesia.com) website.
 
-**Current scope:** auth, leads, the public service catalogue (full `/services/{slug}` page CMS), and orders.
+**Current scope:** auth, leads, services, orders, pricing, portfolio, and articles CMS.
 
 ## Stack
 
@@ -57,6 +57,7 @@ alembic check                # fail if models have drifted from migrations
 python -m scripts.seed_services   # upsert the public service catalogue
 python -m scripts.seed_pricing    # upsert /pricing page, models, packages
 python -m scripts.seed_portfolio  # upsert /portfolio page and case studies
+python -m scripts.seed_articles   # upsert /articles page and posts
 ```
 
 ## Layout
@@ -88,6 +89,8 @@ Public:
 | `GET` | `/api/v1/pricing/packages/{slug}` | One published BDT package. |
 | `GET` | `/api/v1/portfolio` | Full `/portfolio` page: chrome + published projects only. |
 | `GET` | `/api/v1/portfolio/projects/{slug}` | One published case study. No `internal_notes`. |
+| `GET` | `/api/v1/articles` | Full `/articles` page: chrome + featured + published posts. Optional `?topic=`. |
+| `GET` | `/api/v1/articles/{slug}` | One published article. No `internal_notes`. |
 | `POST` | `/api/v1/orders` | Buy / order a published service. Saved to the admin inbox. Emails only if free Gmail SMTP is set. |
 | `POST` | `/api/v1/leads` | Contact form submission. Rate limited, honeypot + Turnstile checked. |
 | `GET` | `/health/live` | Liveness probe. |
@@ -107,6 +110,8 @@ Authenticated:
 | `GET` `POST` `PATCH` `DELETE` | `/api/v1/admin/pricing/packages[/{id or slug}]` | editor |
 | `GET` `PATCH` | `/api/v1/admin/portfolio` | editor |
 | `GET` `POST` `PATCH` `DELETE` | `/api/v1/admin/portfolio/projects[/{id or slug}]` | editor |
+| `GET` `PATCH` | `/api/v1/admin/articles` | editor |
+| `GET` `POST` `PATCH` `DELETE` | `/api/v1/admin/articles/posts[/{id or slug}]` | editor |
 | `GET` `PATCH` | `/api/v1/admin/orders[/{id}]` | editor |
 | `GET` | `/api/v1/admin/orders/stats` | editor |
 | `GET` `PATCH` | `/api/v1/admin/leads[/{id}]` | editor |
