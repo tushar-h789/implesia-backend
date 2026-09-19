@@ -1,3 +1,4 @@
+import uuid
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, status
@@ -30,9 +31,9 @@ async def read_public_articles(db: DbSession, topic: str | None = None) -> Artic
     return body
 
 
-@public_router.get("/{slug}", response_model=ArticlePublic)
-async def read_published_article(db: DbSession, slug: str) -> ArticlePublic:
-    item = await article_service.get_article_by_slug(db, slug, published_only=True)
+@public_router.get("/{article_id}", response_model=ArticlePublic)
+async def read_published_article(db: DbSession, article_id: uuid.UUID) -> ArticlePublic:
+    item = await article_service.get_article_by_id(db, article_id, published_only=True)
     return ArticlePublic.model_validate(item)
 
 
@@ -79,21 +80,21 @@ async def create_article(db: DbSession, payload: ArticleCreate) -> ArticleAdmin:
     return ArticleAdmin.model_validate(item)
 
 
-@admin_router.get("/posts/{article_ref}", response_model=ArticleAdmin)
-async def read_article(db: DbSession, article_ref: str) -> ArticleAdmin:
-    item = await article_service.get_article_by_ref(db, article_ref)
+@admin_router.get("/posts/{post_id}", response_model=ArticleAdmin)
+async def read_article(db: DbSession, post_id: uuid.UUID) -> ArticleAdmin:
+    item = await article_service.get_article_by_id(db, post_id)
     return ArticleAdmin.model_validate(item)
 
 
-@admin_router.patch("/posts/{article_ref}", response_model=ArticleAdmin)
-async def update_article(db: DbSession, article_ref: str, payload: ArticleUpdate) -> ArticleAdmin:
-    item = await article_service.get_article_by_ref(db, article_ref)
+@admin_router.patch("/posts/{post_id}", response_model=ArticleAdmin)
+async def update_article(db: DbSession, post_id: uuid.UUID, payload: ArticleUpdate) -> ArticleAdmin:
+    item = await article_service.get_article_by_id(db, post_id)
     updated = await article_service.update_article(db, item, payload)
     return ArticleAdmin.model_validate(updated)
 
 
-@admin_router.delete("/posts/{article_ref}", response_model=Message)
-async def delete_article(db: DbSession, article_ref: str) -> Message:
-    item = await article_service.get_article_by_ref(db, article_ref)
+@admin_router.delete("/posts/{post_id}", response_model=Message)
+async def delete_article(db: DbSession, post_id: uuid.UUID) -> Message:
+    item = await article_service.get_article_by_id(db, post_id)
     await article_service.delete_article(db, item)
     return Message(message="Article deleted")

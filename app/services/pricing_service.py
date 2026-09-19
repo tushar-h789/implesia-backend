@@ -93,9 +93,11 @@ async def update_page(
     return page
 
 
-async def get_model_by_id(db: AsyncSession, model_id: uuid.UUID) -> EngagementModel:
+async def get_model_by_id(
+    db: AsyncSession, model_id: uuid.UUID, *, published_only: bool = False
+) -> EngagementModel:
     item = await db.get(EngagementModel, model_id)
-    if item is None:
+    if item is None or (published_only and not item.is_published):
         raise NotFoundError("Engagement model not found")
     return item
 
@@ -117,7 +119,7 @@ async def get_model_by_ref(
     db: AsyncSession, ref: str, *, published_only: bool = False
 ) -> EngagementModel:
     try:
-        return await get_model_by_id(db, uuid.UUID(ref))
+        return await get_model_by_id(db, uuid.UUID(ref), published_only=published_only)
     except ValueError:
         return await get_model_by_slug(db, ref, published_only=published_only)
 
@@ -189,9 +191,11 @@ async def delete_model(db: AsyncSession, item: EngagementModel) -> None:
     await db.commit()
 
 
-async def get_package_by_id(db: AsyncSession, package_id: uuid.UUID) -> PricingPackage:
+async def get_package_by_id(
+    db: AsyncSession, package_id: uuid.UUID, *, published_only: bool = False
+) -> PricingPackage:
     item = await db.get(PricingPackage, package_id)
-    if item is None:
+    if item is None or (published_only and not item.is_published):
         raise NotFoundError("Pricing package not found")
     return item
 
@@ -213,7 +217,7 @@ async def get_package_by_ref(
     db: AsyncSession, ref: str, *, published_only: bool = False
 ) -> PricingPackage:
     try:
-        return await get_package_by_id(db, uuid.UUID(ref))
+        return await get_package_by_id(db, uuid.UUID(ref), published_only=published_only)
     except ValueError:
         return await get_package_by_slug(db, ref, published_only=published_only)
 

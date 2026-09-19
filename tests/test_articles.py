@@ -41,7 +41,7 @@ async def test_public_hides_drafts_and_internal_notes(
     assert created.status_code == 201, created.text
     assert created.json()["internal_notes"].startswith("Do not show")
 
-    await client.post(
+    draft = await client.post(
         "/api/v1/admin/articles/posts",
         json={
             **ARTICLE,
@@ -52,6 +52,7 @@ async def test_public_hides_drafts_and_internal_notes(
         },
         headers=auth_headers,
     )
+    assert draft.status_code == 201
 
     public = await client.get("/api/v1/articles")
     assert public.status_code == 200, public.text
@@ -62,10 +63,12 @@ async def test_public_hides_drafts_and_internal_notes(
     assert "internal_notes" not in body["featured"]
     assert "internal_notes" not in body["articles"][0]
 
-    card = await client.get("/api/v1/articles/zero-trust-modern-saas")
+    article_id = created.json()["id"]
+    card = await client.get(f"/api/v1/articles/{article_id}")
     assert card.status_code == 200
     assert "internal_notes" not in card.json()
-    assert (await client.get("/api/v1/articles/draft-insight")).status_code == 404
+    assert (await client.get("/api/v1/articles/zero-trust-modern-saas")).status_code == 422
+    assert (await client.get(f"/api/v1/articles/{draft.json()['id']}")).status_code == 404
 
     filtered = await client.get("/api/v1/articles", params={"topic": "security"})
     assert [item["slug"] for item in filtered.json()["articles"]] == ["zero-trust-modern-saas"]
@@ -78,13 +81,12 @@ async def test_admin_crud_and_auth_boundaries(
 ) -> None:
     created = await client.post("/api/v1/admin/articles/posts", json=ARTICLE, headers=auth_headers)
     assert created.status_code == 201
-    admin_get = await client.get(
-        "/api/v1/admin/articles/posts/zero-trust-modern-saas", headers=auth_headers
-    )
+    post_id = created.json()["id"]
+    admin_get = await client.get(f"/api/v1/admin/articles/posts/{post_id}", headers=auth_headers)
     assert admin_get.json()["internal_notes"].startswith("Do not show")
 
     patched = await client.patch(
-        "/api/v1/admin/articles/posts/zero-trust-modern-saas",
+        f"/api/v1/admin/articles/posts/{post_id}",
         json={"reading_minutes": 19, "is_published": True},
         headers=auth_headers,
     )
@@ -113,9 +115,7 @@ async def test_admin_crud_and_auth_boundaries(
     assert forbidden.status_code == 403
     assert forbidden.json()["error"]["code"] == "forbidden"
 
-    deleted = await client.delete(
-        "/api/v1/admin/articles/posts/zero-trust-modern-saas", headers=auth_headers
-    )
+    deleted = await client.delete(f"/api/v1/admin/articles/posts/{post_id}", headers=auth_headers)
     assert deleted.status_code == 200
 
 

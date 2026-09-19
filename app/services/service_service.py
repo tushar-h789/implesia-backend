@@ -17,9 +17,11 @@ def _unique_slug(name: str, explicit: str | None) -> str:
     return slug
 
 
-async def get_by_id(db: AsyncSession, service_id: uuid.UUID) -> Service:
+async def get_by_id(
+    db: AsyncSession, service_id: uuid.UUID, *, published_only: bool = False
+) -> Service:
     service = await db.get(Service, service_id)
-    if service is None:
+    if service is None or (published_only and not service.is_published):
         raise NotFoundError("Service not found")
     return service
 
@@ -27,7 +29,7 @@ async def get_by_id(db: AsyncSession, service_id: uuid.UUID) -> Service:
 async def get_by_ref(db: AsyncSession, ref: str, *, published_only: bool = False) -> Service:
     """Resolve a service by UUID or slug so admin and Bruno URLs stay usable."""
     try:
-        return await get_by_id(db, uuid.UUID(ref))
+        return await get_by_id(db, uuid.UUID(ref), published_only=published_only)
     except ValueError:
         return await get_by_slug(db, ref, published_only=published_only)
 

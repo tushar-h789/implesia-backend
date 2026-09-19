@@ -84,8 +84,7 @@ body:json {
 script:post-response {
   const body = res.getBody();
   if (res.getStatus() === 201 && body.id) {
-    bru.setEnvVar("SERVICE_ID", body.id);
-    bru.setEnvVar("SERVICE_SLUG", body.slug);
+    bru.setEnvVar("DEMO_SERVICE_ID", body.id);
   }
 }
 

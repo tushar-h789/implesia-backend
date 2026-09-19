@@ -77,9 +77,11 @@ async def update_page(
     return page
 
 
-async def get_project_by_id(db: AsyncSession, project_id: uuid.UUID) -> PortfolioProject:
+async def get_project_by_id(
+    db: AsyncSession, project_id: uuid.UUID, *, published_only: bool = False
+) -> PortfolioProject:
     item = await db.get(PortfolioProject, project_id)
-    if item is None:
+    if item is None or (published_only and not item.is_published):
         raise NotFoundError("Portfolio project not found")
     return item
 
@@ -101,12 +103,9 @@ async def get_project_by_ref(
     db: AsyncSession, ref: str, *, published_only: bool = False
 ) -> PortfolioProject:
     try:
-        item = await get_project_by_id(db, uuid.UUID(ref))
+        return await get_project_by_id(db, uuid.UUID(ref), published_only=published_only)
     except ValueError:
         return await get_project_by_slug(db, ref, published_only=published_only)
-    if published_only and not item.is_published:
-        raise NotFoundError("Portfolio project not found")
-    return item
 
 
 async def list_projects(

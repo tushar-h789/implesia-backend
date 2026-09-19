@@ -32,8 +32,8 @@ body:json {
 
 script:post-response {
   const body = res.getBody();
-  if (res.getStatus() === 201 && body.slug) {
-    bru.setEnvVar("PROJECT_SLUG", body.slug);
+  if (res.getStatus() === 201 && body.id) {
+    bru.setEnvVar("DEMO_PROJECT_ID", body.id);
   }
 }
 

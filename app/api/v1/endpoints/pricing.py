@@ -1,3 +1,4 @@
+import uuid
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, status
@@ -32,15 +33,15 @@ async def read_public_pricing(db: DbSession) -> PricingPagePublic:
     return body
 
 
-@public_router.get("/models/{slug}", response_model=EngagementModelRead)
-async def read_published_model(db: DbSession, slug: str) -> EngagementModelRead:
-    item = await pricing_service.get_model_by_slug(db, slug, published_only=True)
+@public_router.get("/models/{model_id}", response_model=EngagementModelRead)
+async def read_published_model(db: DbSession, model_id: uuid.UUID) -> EngagementModelRead:
+    item = await pricing_service.get_model_by_id(db, model_id, published_only=True)
     return EngagementModelRead.model_validate(item)
 
 
-@public_router.get("/packages/{slug}", response_model=PricingPackageRead)
-async def read_published_package(db: DbSession, slug: str) -> PricingPackageRead:
-    item = await pricing_service.get_package_by_slug(db, slug, published_only=True)
+@public_router.get("/packages/{package_id}", response_model=PricingPackageRead)
+async def read_published_package(db: DbSession, package_id: uuid.UUID) -> PricingPackageRead:
+    item = await pricing_service.get_package_by_id(db, package_id, published_only=True)
     return PricingPackageRead.model_validate(item)
 
 
@@ -83,24 +84,24 @@ async def create_model(db: DbSession, payload: EngagementModelCreate) -> Engagem
     return EngagementModelRead.model_validate(item)
 
 
-@admin_router.get("/models/{model_ref}", response_model=EngagementModelRead)
-async def read_model(db: DbSession, model_ref: str) -> EngagementModelRead:
-    item = await pricing_service.get_model_by_ref(db, model_ref)
+@admin_router.get("/models/{model_id}", response_model=EngagementModelRead)
+async def read_model(db: DbSession, model_id: uuid.UUID) -> EngagementModelRead:
+    item = await pricing_service.get_model_by_id(db, model_id)
     return EngagementModelRead.model_validate(item)
 
 
-@admin_router.patch("/models/{model_ref}", response_model=EngagementModelRead)
+@admin_router.patch("/models/{model_id}", response_model=EngagementModelRead)
 async def update_model(
-    db: DbSession, model_ref: str, payload: EngagementModelUpdate
+    db: DbSession, model_id: uuid.UUID, payload: EngagementModelUpdate
 ) -> EngagementModelRead:
-    item = await pricing_service.get_model_by_ref(db, model_ref)
+    item = await pricing_service.get_model_by_id(db, model_id)
     updated = await pricing_service.update_model(db, item, payload)
     return EngagementModelRead.model_validate(updated)
 
 
-@admin_router.delete("/models/{model_ref}", response_model=Message)
-async def delete_model(db: DbSession, model_ref: str) -> Message:
-    item = await pricing_service.get_model_by_ref(db, model_ref)
+@admin_router.delete("/models/{model_id}", response_model=Message)
+async def delete_model(db: DbSession, model_id: uuid.UUID) -> Message:
+    item = await pricing_service.get_model_by_id(db, model_id)
     await pricing_service.delete_model(db, item)
     return Message(message="Engagement model deleted")
 
@@ -131,23 +132,23 @@ async def create_package(db: DbSession, payload: PricingPackageCreate) -> Pricin
     return PricingPackageRead.model_validate(item)
 
 
-@admin_router.get("/packages/{package_ref}", response_model=PricingPackageRead)
-async def read_package(db: DbSession, package_ref: str) -> PricingPackageRead:
-    item = await pricing_service.get_package_by_ref(db, package_ref)
+@admin_router.get("/packages/{package_id}", response_model=PricingPackageRead)
+async def read_package(db: DbSession, package_id: uuid.UUID) -> PricingPackageRead:
+    item = await pricing_service.get_package_by_id(db, package_id)
     return PricingPackageRead.model_validate(item)
 
 
-@admin_router.patch("/packages/{package_ref}", response_model=PricingPackageRead)
+@admin_router.patch("/packages/{package_id}", response_model=PricingPackageRead)
 async def update_package(
-    db: DbSession, package_ref: str, payload: PricingPackageUpdate
+    db: DbSession, package_id: uuid.UUID, payload: PricingPackageUpdate
 ) -> PricingPackageRead:
-    item = await pricing_service.get_package_by_ref(db, package_ref)
+    item = await pricing_service.get_package_by_id(db, package_id)
     updated = await pricing_service.update_package(db, item, payload)
     return PricingPackageRead.model_validate(updated)
 
 
-@admin_router.delete("/packages/{package_ref}", response_model=Message)
-async def delete_package(db: DbSession, package_ref: str) -> Message:
-    item = await pricing_service.get_package_by_ref(db, package_ref)
+@admin_router.delete("/packages/{package_id}", response_model=Message)
+async def delete_package(db: DbSession, package_id: uuid.UUID) -> Message:
+    item = await pricing_service.get_package_by_id(db, package_id)
     await pricing_service.delete_package(db, item)
     return Message(message="Pricing package deleted")

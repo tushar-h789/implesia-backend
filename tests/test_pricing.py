@@ -91,16 +91,25 @@ async def test_public_pricing_assembles_page(
 async def test_public_get_model_and_package(
     client: AsyncClient, auth_headers: dict[str, str]
 ) -> None:
-    await client.post("/api/v1/admin/pricing/models", json=MODEL, headers=auth_headers)
-    await client.post("/api/v1/admin/pricing/packages", json=PACKAGE, headers=auth_headers)
+    created_model = await client.post(
+        "/api/v1/admin/pricing/models", json=MODEL, headers=auth_headers
+    )
+    created_package = await client.post(
+        "/api/v1/admin/pricing/packages", json=PACKAGE, headers=auth_headers
+    )
+    assert created_model.status_code == 201
+    assert created_package.status_code == 201
+    model_id = created_model.json()["id"]
+    package_id = created_package.json()["id"]
 
-    model = await client.get("/api/v1/pricing/models/discovery-sprint")
+    model = await client.get(f"/api/v1/pricing/models/{model_id}")
     assert model.status_code == 200
     assert model.json()["price_label"] == "From $1,500"
 
-    package = await client.get("/api/v1/pricing/packages/product-landing-page")
+    package = await client.get(f"/api/v1/pricing/packages/{package_id}")
     assert package.status_code == 200
     assert package.json()["price_label"] == "৳40,000"
+    assert (await client.get("/api/v1/pricing/models/discovery-sprint")).status_code == 422
 
     hidden = await client.post(
         "/api/v1/admin/pricing/models",
@@ -108,7 +117,7 @@ async def test_public_get_model_and_package(
         headers=auth_headers,
     )
     assert hidden.status_code == 201
-    assert (await client.get("/api/v1/pricing/models/draft-model")).status_code == 404
+    assert (await client.get(f"/api/v1/pricing/models/{hidden.json()['id']}")).status_code == 404
 
 
 async def test_admin_model_and_package_crud(
@@ -118,12 +127,11 @@ async def test_admin_model_and_package_crud(
         "/api/v1/admin/pricing/models", json=MODEL, headers=auth_headers
     )
     assert created_model.status_code == 201, created_model.text
-    by_slug = await client.get(
-        "/api/v1/admin/pricing/models/discovery-sprint", headers=auth_headers
-    )
-    assert by_slug.status_code == 200
+    model_id = created_model.json()["id"]
+    by_id = await client.get(f"/api/v1/admin/pricing/models/{model_id}", headers=auth_headers)
+    assert by_id.status_code == 200
     patched = await client.patch(
-        "/api/v1/admin/pricing/models/discovery-sprint",
+        f"/api/v1/admin/pricing/models/{model_id}",
         json={"price_label": "From $1,800"},
         headers=auth_headers,
     )
@@ -133,8 +141,9 @@ async def test_admin_model_and_package_crud(
         "/api/v1/admin/pricing/packages", json=PACKAGE, headers=auth_headers
     )
     assert created_package.status_code == 201, created_package.text
+    package_id = created_package.json()["id"]
     updated = await client.patch(
-        "/api/v1/admin/pricing/packages/product-landing-page",
+        f"/api/v1/admin/pricing/packages/{package_id}",
         json={"price_amount_bdt": 42000, "price_label": "৳42,000"},
         headers=auth_headers,
     )
@@ -145,13 +154,11 @@ async def test_admin_model_and_package_crud(
     assert listed.json()["total"] == 1
 
     deleted = await client.delete(
-        "/api/v1/admin/pricing/packages/product-landing-page", headers=auth_headers
+        f"/api/v1/admin/pricing/packages/{package_id}", headers=auth_headers
     )
     assert deleted.status_code == 200
     assert (
-        await client.get(
-            "/api/v1/admin/pricing/packages/product-landing-page", headers=auth_headers
-        )
+        await client.get(f"/api/v1/admin/pricing/packages/{package_id}", headers=auth_headers)
     ).status_code == 404
 
 

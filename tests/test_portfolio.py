@@ -40,11 +40,12 @@ async def test_public_hides_drafts_and_internal_notes(
     assert created.status_code == 201, created.text
     assert created.json()["internal_notes"].startswith("Do not show")
 
-    await client.post(
+    draft = await client.post(
         "/api/v1/admin/portfolio/projects",
         json={**PROJECT, "name": "Draft Case", "slug": "draft-case", "is_published": False},
         headers=auth_headers,
     )
+    assert draft.status_code == 201
 
     public = await client.get("/api/v1/portfolio")
     assert public.status_code == 200, public.text
@@ -55,10 +56,12 @@ async def test_public_hides_drafts_and_internal_notes(
     assert "internal_notes" not in body["featured"]
     assert "internal_notes" not in body["projects"][0]
 
-    card = await client.get("/api/v1/portfolio/projects/gulf-franchise")
+    project_id = created.json()["id"]
+    card = await client.get(f"/api/v1/portfolio/projects/{project_id}")
     assert card.status_code == 200
     assert "internal_notes" not in card.json()
-    assert (await client.get("/api/v1/portfolio/projects/draft-case")).status_code == 404
+    assert (await client.get("/api/v1/portfolio/projects/gulf-franchise")).status_code == 422
+    assert (await client.get(f"/api/v1/portfolio/projects/{draft.json()['id']}")).status_code == 404
 
 
 async def test_public_rejects_javascript_live_url(
@@ -80,13 +83,14 @@ async def test_admin_crud_and_auth_boundaries(
         "/api/v1/admin/portfolio/projects", json=PROJECT, headers=auth_headers
     )
     assert created.status_code == 201
+    project_id = created.json()["id"]
     admin_get = await client.get(
-        "/api/v1/admin/portfolio/projects/gulf-franchise", headers=auth_headers
+        f"/api/v1/admin/portfolio/projects/{project_id}", headers=auth_headers
     )
     assert admin_get.json()["internal_notes"].startswith("Do not show")
 
     patched = await client.patch(
-        "/api/v1/admin/portfolio/projects/gulf-franchise",
+        f"/api/v1/admin/portfolio/projects/{project_id}",
         json={"status": "Completed", "year": 2025},
         headers=auth_headers,
     )
@@ -115,7 +119,7 @@ async def test_admin_crud_and_auth_boundaries(
     assert forbidden.json()["error"]["code"] == "forbidden"
 
     deleted = await client.delete(
-        "/api/v1/admin/portfolio/projects/gulf-franchise", headers=auth_headers
+        f"/api/v1/admin/portfolio/projects/{project_id}", headers=auth_headers
     )
     assert deleted.status_code == 200
 

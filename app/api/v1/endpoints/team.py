@@ -1,3 +1,4 @@
+import uuid
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, status
@@ -30,9 +31,9 @@ async def read_public_team(db: DbSession) -> TeamPagePublic:
     return body
 
 
-@public_router.get("/members/{slug}", response_model=TeamMemberPublic)
-async def read_published_member(db: DbSession, slug: str) -> TeamMemberPublic:
-    item = await team_service.get_member_by_slug(db, slug, published_only=True)
+@public_router.get("/members/{member_id}", response_model=TeamMemberPublic)
+async def read_published_member(db: DbSession, member_id: uuid.UUID) -> TeamMemberPublic:
+    item = await team_service.get_member_by_id(db, member_id, published_only=True)
     return TeamMemberPublic.model_validate(item)
 
 
@@ -77,23 +78,23 @@ async def create_member(db: DbSession, payload: TeamMemberCreate) -> TeamMemberA
     return TeamMemberAdmin.model_validate(item)
 
 
-@admin_router.get("/members/{member_ref}", response_model=TeamMemberAdmin)
-async def read_member(db: DbSession, member_ref: str) -> TeamMemberAdmin:
-    item = await team_service.get_member_by_ref(db, member_ref)
+@admin_router.get("/members/{member_id}", response_model=TeamMemberAdmin)
+async def read_member(db: DbSession, member_id: uuid.UUID) -> TeamMemberAdmin:
+    item = await team_service.get_member_by_id(db, member_id)
     return TeamMemberAdmin.model_validate(item)
 
 
-@admin_router.patch("/members/{member_ref}", response_model=TeamMemberAdmin)
+@admin_router.patch("/members/{member_id}", response_model=TeamMemberAdmin)
 async def update_member(
-    db: DbSession, member_ref: str, payload: TeamMemberUpdate
+    db: DbSession, member_id: uuid.UUID, payload: TeamMemberUpdate
 ) -> TeamMemberAdmin:
-    item = await team_service.get_member_by_ref(db, member_ref)
+    item = await team_service.get_member_by_id(db, member_id)
     updated = await team_service.update_member(db, item, payload)
     return TeamMemberAdmin.model_validate(updated)
 
 
-@admin_router.delete("/members/{member_ref}", response_model=Message)
-async def delete_member(db: DbSession, member_ref: str) -> Message:
-    item = await team_service.get_member_by_ref(db, member_ref)
+@admin_router.delete("/members/{member_id}", response_model=Message)
+async def delete_member(db: DbSession, member_id: uuid.UUID) -> Message:
+    item = await team_service.get_member_by_id(db, member_id)
     await team_service.delete_member(db, item)
     return Message(message="Team member deleted")

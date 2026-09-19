@@ -70,9 +70,11 @@ async def update_page(db: AsyncSession, page: TeamPage, payload: TeamPageUpdate)
     return page
 
 
-async def get_member_by_id(db: AsyncSession, member_id: uuid.UUID) -> TeamMember:
+async def get_member_by_id(
+    db: AsyncSession, member_id: uuid.UUID, *, published_only: bool = False
+) -> TeamMember:
     item = await db.get(TeamMember, member_id)
-    if item is None:
+    if item is None or (published_only and not item.is_published):
         raise NotFoundError("Team member not found")
     return item
 
@@ -94,12 +96,9 @@ async def get_member_by_ref(
     db: AsyncSession, ref: str, *, published_only: bool = False
 ) -> TeamMember:
     try:
-        item = await get_member_by_id(db, uuid.UUID(ref))
+        return await get_member_by_id(db, uuid.UUID(ref), published_only=published_only)
     except ValueError:
         return await get_member_by_slug(db, ref, published_only=published_only)
-    if published_only and not item.is_published:
-        raise NotFoundError("Team member not found")
-    return item
 
 
 async def list_members(

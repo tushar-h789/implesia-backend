@@ -1,3 +1,4 @@
+import uuid
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, status
@@ -28,9 +29,9 @@ async def list_published_services(
     )
 
 
-@public_router.get("/{slug}", response_model=ServiceRead)
-async def read_published_service(db: DbSession, slug: str) -> ServiceRead:
-    service = await service_service.get_by_slug(db, slug, published_only=True)
+@public_router.get("/{service_id}", response_model=ServiceRead)
+async def read_published_service(db: DbSession, service_id: uuid.UUID) -> ServiceRead:
+    service = await service_service.get_by_id(db, service_id, published_only=True)
     return ServiceRead.model_validate(service)
 
 
@@ -62,23 +63,23 @@ async def create_service(db: DbSession, payload: ServiceCreate) -> ServiceRead:
     return ServiceRead.model_validate(service)
 
 
-@admin_router.get("/{service_ref}", response_model=ServiceRead)
-async def read_service(db: DbSession, service_ref: str) -> ServiceRead:
-    service = await service_service.get_by_ref(db, service_ref)
+@admin_router.get("/{service_id}", response_model=ServiceRead)
+async def read_service(db: DbSession, service_id: uuid.UUID) -> ServiceRead:
+    service = await service_service.get_by_id(db, service_id)
     return ServiceRead.model_validate(service)
 
 
-@admin_router.patch("/{service_ref}", response_model=ServiceRead)
+@admin_router.patch("/{service_id}", response_model=ServiceRead)
 async def update_service(
-    db: DbSession, service_ref: str, payload: ServiceUpdate
+    db: DbSession, service_id: uuid.UUID, payload: ServiceUpdate
 ) -> ServiceRead:
-    service = await service_service.get_by_ref(db, service_ref)
+    service = await service_service.get_by_id(db, service_id)
     updated = await service_service.update_service(db, service, payload)
     return ServiceRead.model_validate(updated)
 
 
-@admin_router.delete("/{service_ref}", response_model=Message)
-async def delete_service(db: DbSession, service_ref: str) -> Message:
-    service = await service_service.get_by_ref(db, service_ref)
+@admin_router.delete("/{service_id}", response_model=Message)
+async def delete_service(db: DbSession, service_id: uuid.UUID) -> Message:
+    service = await service_service.get_by_id(db, service_id)
     await service_service.delete_service(db, service)
     return Message(message="Service deleted")

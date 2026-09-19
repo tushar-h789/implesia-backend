@@ -32,7 +32,7 @@ async def test_public_hides_drafts_and_internal_notes(
     assert created.status_code == 201, created.text
     assert created.json()["internal_notes"].startswith("Do not show")
 
-    await client.post(
+    draft = await client.post(
         "/api/v1/admin/team/members",
         json={
             **MEMBER,
@@ -43,6 +43,7 @@ async def test_public_hides_drafts_and_internal_notes(
         },
         headers=auth_headers,
     )
+    assert draft.status_code == 201
 
     public = await client.get("/api/v1/team")
     assert public.status_code == 200, public.text
@@ -53,10 +54,12 @@ async def test_public_hides_drafts_and_internal_notes(
     assert "internal_notes" not in body["featured"]
     assert "internal_notes" not in body["members"][0]
 
-    card = await client.get("/api/v1/team/members/tushar-hossen")
+    member_id = created.json()["id"]
+    card = await client.get(f"/api/v1/team/members/{member_id}")
     assert card.status_code == 200
     assert "internal_notes" not in card.json()
-    assert (await client.get("/api/v1/team/members/draft-engineer")).status_code == 404
+    assert (await client.get("/api/v1/team/members/tushar-hossen")).status_code == 422
+    assert (await client.get(f"/api/v1/team/members/{draft.json()['id']}")).status_code == 404
 
 
 async def test_admin_crud_and_auth_boundaries(
@@ -64,11 +67,12 @@ async def test_admin_crud_and_auth_boundaries(
 ) -> None:
     created = await client.post("/api/v1/admin/team/members", json=MEMBER, headers=auth_headers)
     assert created.status_code == 201
-    admin_get = await client.get("/api/v1/admin/team/members/tushar-hossen", headers=auth_headers)
+    member_id = created.json()["id"]
+    admin_get = await client.get(f"/api/v1/admin/team/members/{member_id}", headers=auth_headers)
     assert admin_get.json()["internal_notes"].startswith("Do not show")
 
     patched = await client.patch(
-        "/api/v1/admin/team/members/tushar-hossen",
+        f"/api/v1/admin/team/members/{member_id}",
         json={"role": "Founder and CEO", "is_published": True},
         headers=auth_headers,
     )
@@ -96,7 +100,7 @@ async def test_admin_crud_and_auth_boundaries(
     assert forbidden.status_code == 403
     assert forbidden.json()["error"]["code"] == "forbidden"
 
-    deleted = await client.delete("/api/v1/admin/team/members/tushar-hossen", headers=auth_headers)
+    deleted = await client.delete(f"/api/v1/admin/team/members/{member_id}", headers=auth_headers)
     assert deleted.status_code == 200
 
 

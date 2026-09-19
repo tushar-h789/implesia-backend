@@ -72,9 +72,11 @@ async def update_page(
     return page
 
 
-async def get_article_by_id(db: AsyncSession, article_id: uuid.UUID) -> Article:
+async def get_article_by_id(
+    db: AsyncSession, article_id: uuid.UUID, *, published_only: bool = False
+) -> Article:
     item = await db.get(Article, article_id)
-    if item is None:
+    if item is None or (published_only and not item.is_published):
         raise NotFoundError("Article not found")
     return item
 
@@ -96,12 +98,9 @@ async def get_article_by_ref(
     db: AsyncSession, ref: str, *, published_only: bool = False
 ) -> Article:
     try:
-        item = await get_article_by_id(db, uuid.UUID(ref))
+        return await get_article_by_id(db, uuid.UUID(ref), published_only=published_only)
     except ValueError:
         return await get_article_by_slug(db, ref, published_only=published_only)
-    if published_only and not item.is_published:
-        raise NotFoundError("Article not found")
-    return item
 
 
 async def list_articles(

@@ -86,17 +86,17 @@ Public:
 | Method | Path | Notes |
 |---|---|---|
 | `GET` | `/api/v1/services` | Published services for the website. |
-| `GET` | `/api/v1/services/{slug}` | One published service. |
+| `GET` | `/api/v1/services/{service_id}` | One published service. Slug is a field, not the lookup key. |
 | `GET` | `/api/v1/pricing` | Full `/pricing` page: chrome, models, packages, FAQs. |
-| `GET` | `/api/v1/pricing/models/{slug}` | One published engagement model. |
-| `GET` | `/api/v1/pricing/packages/{slug}` | One published BDT package. |
+| `GET` | `/api/v1/pricing/models/{model_id}` | One published engagement model. |
+| `GET` | `/api/v1/pricing/packages/{package_id}` | One published BDT package. |
 | `GET` | `/api/v1/portfolio` | Full `/portfolio` page: chrome + published projects only. |
-| `GET` | `/api/v1/portfolio/projects/{slug}` | One published case study. No `internal_notes`. |
+| `GET` | `/api/v1/portfolio/projects/{project_id}` | One published case study. No `internal_notes`. |
 | `GET` | `/api/v1/articles` | Full `/articles` page: chrome + featured + published posts. Optional `?topic=`. |
-| `GET` | `/api/v1/articles/{slug}` | One published article. No `internal_notes`. |
+| `GET` | `/api/v1/articles/{article_id}` | One published article. No `internal_notes`. |
 | `GET` | `/api/v1/about-us` | Full `/about-us` page. No `internal_notes`. |
 | `GET` | `/api/v1/team` | Full `/team` page: chrome + published members only. |
-| `GET` | `/api/v1/team/members/{slug}` | One published team member. No `internal_notes`. |
+| `GET` | `/api/v1/team/members/{member_id}` | One published team member. No `internal_notes`. |
 | `GET` | `/api/v1/contact` | Full `/contact` page. Form `form_action` is `/api/v1/leads`. No `internal_notes`. |
 | `POST` | `/api/v1/orders` | Buy / order a published service. Saved to the admin inbox. Emails only if free Gmail SMTP is set. |
 | `POST` | `/api/v1/leads` | Contact form submission. Rate limited, honeypot + Turnstile checked. |
@@ -111,17 +111,17 @@ Authenticated:
 | `POST` | `/api/v1/auth/refresh` | — |
 | `GET` | `/api/v1/auth/me` | viewer |
 | `POST` | `/api/v1/auth/change-password` | viewer |
-| `GET` `POST` `PATCH` `DELETE` | `/api/v1/admin/services[/{id or slug}]` | editor |
+| `GET` `POST` `PATCH` `DELETE` | `/api/v1/admin/services[/{service_id}]` | editor |
 | `GET` `PATCH` | `/api/v1/admin/pricing` | editor |
-| `GET` `POST` `PATCH` `DELETE` | `/api/v1/admin/pricing/models[/{id or slug}]` | editor |
-| `GET` `POST` `PATCH` `DELETE` | `/api/v1/admin/pricing/packages[/{id or slug}]` | editor |
+| `GET` `POST` `PATCH` `DELETE` | `/api/v1/admin/pricing/models[/{model_id}]` | editor |
+| `GET` `POST` `PATCH` `DELETE` | `/api/v1/admin/pricing/packages[/{package_id}]` | editor |
 | `GET` `PATCH` | `/api/v1/admin/portfolio` | editor |
-| `GET` `POST` `PATCH` `DELETE` | `/api/v1/admin/portfolio/projects[/{id or slug}]` | editor |
+| `GET` `POST` `PATCH` `DELETE` | `/api/v1/admin/portfolio/projects[/{project_id}]` | editor |
 | `GET` `PATCH` | `/api/v1/admin/articles` | editor |
-| `GET` `POST` `PATCH` `DELETE` | `/api/v1/admin/articles/posts[/{id or slug}]` | editor |
+| `GET` `POST` `PATCH` `DELETE` | `/api/v1/admin/articles/posts[/{post_id}]` | editor |
 | `GET` `PATCH` | `/api/v1/admin/about-us` | editor |
 | `GET` `PATCH` | `/api/v1/admin/team` | editor |
-| `GET` `POST` `PATCH` `DELETE` | `/api/v1/admin/team/members[/{id or slug}]` | editor |
+| `GET` `POST` `PATCH` `DELETE` | `/api/v1/admin/team/members[/{member_id}]` | editor |
 | `GET` `PATCH` | `/api/v1/admin/contact` | editor |
 | `GET` `PATCH` | `/api/v1/admin/orders[/{id}]` | editor |
 | `GET` | `/api/v1/admin/orders/stats` | editor |

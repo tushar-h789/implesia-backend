@@ -58,9 +58,11 @@ async def test_public_list_hides_drafts(client: AsyncClient, auth_headers: dict[
     assert slugs == ["saas-architecture"]
 
 
-async def test_public_get_by_slug(client: AsyncClient, auth_headers: dict[str, str]) -> None:
-    await client.post("/api/v1/admin/services", json=VALID_SERVICE, headers=auth_headers)
-    response = await client.get("/api/v1/services/saas-architecture")
+async def test_public_get_by_id(client: AsyncClient, auth_headers: dict[str, str]) -> None:
+    created = await client.post("/api/v1/admin/services", json=VALID_SERVICE, headers=auth_headers)
+    assert created.status_code == 201
+    service_id = created.json()["id"]
+    response = await client.get(f"/api/v1/services/{service_id}")
     assert response.status_code == 200
     body = response.json()
     assert body["name"] == "SaaS Architecture"
@@ -71,16 +73,19 @@ async def test_public_get_by_slug(client: AsyncClient, auth_headers: dict[str, s
     assert body["cta_highlights"] == ["Free Strategy Call", "NDA Available", "Senior Engineers"]
     assert body["related_slugs"] == ["web-platforms", "mobile-apps"]
     assert body["seo_title"] == "SaaS Architecture | Implesia IT"
+    assert (await client.get("/api/v1/services/saas-architecture")).status_code == 422
 
 
-async def test_admin_get_by_slug(client: AsyncClient, auth_headers: dict[str, str]) -> None:
-    await client.post("/api/v1/admin/services", json=VALID_SERVICE, headers=auth_headers)
-    response = await client.get("/api/v1/admin/services/saas-architecture", headers=auth_headers)
+async def test_admin_get_by_id(client: AsyncClient, auth_headers: dict[str, str]) -> None:
+    created = await client.post("/api/v1/admin/services", json=VALID_SERVICE, headers=auth_headers)
+    assert created.status_code == 201
+    service_id = created.json()["id"]
+    response = await client.get(f"/api/v1/admin/services/{service_id}", headers=auth_headers)
     assert response.status_code == 200
     assert response.json()["slug"] == "saas-architecture"
 
 
-async def test_public_cannot_read_draft_slug(
+async def test_public_cannot_read_draft_by_id(
     client: AsyncClient, auth_headers: dict[str, str]
 ) -> None:
     created = await client.post(
@@ -89,7 +94,9 @@ async def test_public_cannot_read_draft_slug(
         headers=auth_headers,
     )
     assert created.status_code == 201
-    assert (await client.get("/api/v1/services/hidden")).status_code == 404
+    service_id = created.json()["id"]
+    assert (await client.get(f"/api/v1/services/{service_id}")).status_code == 404
+    assert (await client.get("/api/v1/services/hidden")).status_code == 422
 
 
 async def test_admin_crud_round_trip(client: AsyncClient, auth_headers: dict[str, str]) -> None:

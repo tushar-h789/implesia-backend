@@ -1,3 +1,4 @@
+import uuid
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, status
@@ -32,9 +33,9 @@ async def read_public_portfolio(db: DbSession, category: str | None = None) -> P
     return body
 
 
-@public_router.get("/projects/{slug}", response_model=PortfolioProjectPublic)
-async def read_published_project(db: DbSession, slug: str) -> PortfolioProjectPublic:
-    item = await portfolio_service.get_project_by_slug(db, slug, published_only=True)
+@public_router.get("/projects/{project_id}", response_model=PortfolioProjectPublic)
+async def read_published_project(db: DbSession, project_id: uuid.UUID) -> PortfolioProjectPublic:
+    item = await portfolio_service.get_project_by_id(db, project_id, published_only=True)
     return PortfolioProjectPublic.model_validate(item)
 
 
@@ -85,23 +86,23 @@ async def create_project(db: DbSession, payload: PortfolioProjectCreate) -> Port
     return PortfolioProjectAdmin.model_validate(item)
 
 
-@admin_router.get("/projects/{project_ref}", response_model=PortfolioProjectAdmin)
-async def read_project(db: DbSession, project_ref: str) -> PortfolioProjectAdmin:
-    item = await portfolio_service.get_project_by_ref(db, project_ref)
+@admin_router.get("/projects/{project_id}", response_model=PortfolioProjectAdmin)
+async def read_project(db: DbSession, project_id: uuid.UUID) -> PortfolioProjectAdmin:
+    item = await portfolio_service.get_project_by_id(db, project_id)
     return PortfolioProjectAdmin.model_validate(item)
 
 
-@admin_router.patch("/projects/{project_ref}", response_model=PortfolioProjectAdmin)
+@admin_router.patch("/projects/{project_id}", response_model=PortfolioProjectAdmin)
 async def update_project(
-    db: DbSession, project_ref: str, payload: PortfolioProjectUpdate
+    db: DbSession, project_id: uuid.UUID, payload: PortfolioProjectUpdate
 ) -> PortfolioProjectAdmin:
-    item = await portfolio_service.get_project_by_ref(db, project_ref)
+    item = await portfolio_service.get_project_by_id(db, project_id)
     updated = await portfolio_service.update_project(db, item, payload)
     return PortfolioProjectAdmin.model_validate(updated)
 
 
-@admin_router.delete("/projects/{project_ref}", response_model=Message)
-async def delete_project(db: DbSession, project_ref: str) -> Message:
-    item = await portfolio_service.get_project_by_ref(db, project_ref)
+@admin_router.delete("/projects/{project_id}", response_model=Message)
+async def delete_project(db: DbSession, project_id: uuid.UUID) -> Message:
+    item = await portfolio_service.get_project_by_id(db, project_id)
     await portfolio_service.delete_project(db, item)
     return Message(message="Portfolio project deleted")

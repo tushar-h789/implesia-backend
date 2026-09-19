@@ -29,24 +29,25 @@ The collection pre-request script adds the Bearer header for `/api/v1/admin/*`, 
 
 ### Safe Read / Update (seeded catalogue)
 
-These slugs already exist. Use them for Get / List / Patch:
+These UUIDs already exist after seed. Use them for Get / List / Patch. Slug stays on the row for frontend URLs; the API looks up by id.
 
 | Folder | Get / Update uses |
 |---|---|
-| Services | `SERVICE_SLUG=web-platforms` |
-| Pricing models | `MODEL_SLUG=discovery-sprint` |
-| Pricing packages | `PACKAGE_SLUG=product-landing-page` |
-| Portfolio | `PROJECT_SLUG=gulf-franchise` |
-| Articles | `ARTICLE_SLUG=zero-trust-modern-saas` |
-| About | singleton page — no slug var |
-| Team | `MEMBER_SLUG=tushar-hossen` |
+| Services | `SERVICE_ID` (`web-platforms`) |
+| Pricing models | `MODEL_ID` (`discovery-sprint`) |
+| Pricing packages | `PACKAGE_ID` (`product-landing-page`) |
+| Portfolio | `PROJECT_ID` (`gulf-franchise`) |
+| Articles (public) | `ARTICLE_ID` (`zero-trust-modern-saas`) |
+| Articles (admin) | `POST_ID` (same UUID as `ARTICLE_ID`) |
+| About | singleton page — no id var |
+| Team | `MEMBER_ID` (`tushar-hossen`) |
 | Contact | singleton page — form still posts to `POST /api/v1/leads` |
 | Orders | `ORDER_ID` from Submit Order |
 | Leads | `LEAD_ID` from a public lead submit |
 
 ### Create / Delete (demo rows only)
 
-Create requests write a **bruno-demo-*** slug. Delete requests target only those demo slugs, never the live catalogue.
+Create writes a `DEMO_*_ID`. Delete uses that id, never the live catalogue.
 
 | Create | Then delete |
 |---|---|
@@ -66,4 +67,5 @@ Do not run `Private / Auth / Change Password` unless you mean to change the admi
 - `401` / `Not authenticated` — run Login again
 - `403` / `forbidden` — account is viewer, needs editor or superadmin
 - `http_error` / `Not Found` — route missing (restart uvicorn) or empty path var
-- `not_found` — that slug/id is not in the database
+- `not_found` — that id is not in the database
+- `422` — path is not a UUID (slug is not accepted)
