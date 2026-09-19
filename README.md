@@ -2,7 +2,7 @@
 
 FastAPI backend for the [implesia.com](https://implesia.com) website.
 
-**Current scope:** auth, leads, services, orders, pricing, portfolio, and articles CMS.
+**Current scope:** auth, leads, services, orders, pricing, portfolio, articles, about-us, team, and contact CMS.
 
 ## Stack
 
@@ -58,6 +58,9 @@ python -m scripts.seed_services   # upsert the public service catalogue
 python -m scripts.seed_pricing    # upsert /pricing page, models, packages
 python -m scripts.seed_portfolio  # upsert /portfolio page and case studies
 python -m scripts.seed_articles   # upsert /articles page and posts
+python -m scripts.seed_about      # upsert /about-us page
+python -m scripts.seed_team       # upsert /team page and members
+python -m scripts.seed_contact    # upsert /contact page
 ```
 
 ## Layout
@@ -91,6 +94,10 @@ Public:
 | `GET` | `/api/v1/portfolio/projects/{slug}` | One published case study. No `internal_notes`. |
 | `GET` | `/api/v1/articles` | Full `/articles` page: chrome + featured + published posts. Optional `?topic=`. |
 | `GET` | `/api/v1/articles/{slug}` | One published article. No `internal_notes`. |
+| `GET` | `/api/v1/about-us` | Full `/about-us` page. No `internal_notes`. |
+| `GET` | `/api/v1/team` | Full `/team` page: chrome + published members only. |
+| `GET` | `/api/v1/team/members/{slug}` | One published team member. No `internal_notes`. |
+| `GET` | `/api/v1/contact` | Full `/contact` page. Form `form_action` is `/api/v1/leads`. No `internal_notes`. |
 | `POST` | `/api/v1/orders` | Buy / order a published service. Saved to the admin inbox. Emails only if free Gmail SMTP is set. |
 | `POST` | `/api/v1/leads` | Contact form submission. Rate limited, honeypot + Turnstile checked. |
 | `GET` | `/health/live` | Liveness probe. |
@@ -112,6 +119,10 @@ Authenticated:
 | `GET` `POST` `PATCH` `DELETE` | `/api/v1/admin/portfolio/projects[/{id or slug}]` | editor |
 | `GET` `PATCH` | `/api/v1/admin/articles` | editor |
 | `GET` `POST` `PATCH` `DELETE` | `/api/v1/admin/articles/posts[/{id or slug}]` | editor |
+| `GET` `PATCH` | `/api/v1/admin/about-us` | editor |
+| `GET` `PATCH` | `/api/v1/admin/team` | editor |
+| `GET` `POST` `PATCH` `DELETE` | `/api/v1/admin/team/members[/{id or slug}]` | editor |
+| `GET` `PATCH` | `/api/v1/admin/contact` | editor |
 | `GET` `PATCH` | `/api/v1/admin/orders[/{id}]` | editor |
 | `GET` | `/api/v1/admin/orders/stats` | editor |
 | `GET` `PATCH` | `/api/v1/admin/leads[/{id}]` | editor |

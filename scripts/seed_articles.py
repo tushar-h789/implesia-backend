@@ -712,8 +712,7 @@ POSTS = [
         published_at=datetime(2025, 10, 28, tzinfo=UTC),
         seo_title="Optimizing Next.js for Sub-Second Times",
         seo_description=(
-            "Rendering strategies, caching, and Core Web Vitals for Next.js at "
-            "enterprise scale."
+            "Rendering strategies, caching, and Core Web Vitals for Next.js at enterprise scale."
         ),
         sort_order=20,
     ),
@@ -756,8 +755,7 @@ POSTS = [
         published_at=datetime(2025, 8, 22, tzinfo=UTC),
         seo_title="Cloud Cost Optimization for Enterprises",
         seo_description=(
-            "FinOps practices for right-sizing, reserved capacity, and "
-            "non-production hygiene."
+            "FinOps practices for right-sizing, reserved capacity, and non-production hygiene."
         ),
         sort_order=40,
     ),
@@ -778,8 +776,7 @@ POSTS = [
         published_at=datetime(2025, 7, 10, tzinfo=UTC),
         seo_title="CI/CD Pipelines Enterprise Teams Trust",
         seo_description=(
-            "Immutable artifacts, quality gates, and progressive delivery for "
-            "enterprise CI/CD."
+            "Immutable artifacts, quality gates, and progressive delivery for enterprise CI/CD."
         ),
         sort_order=50,
     ),
@@ -799,9 +796,7 @@ POSTS = [
         reading_minutes=17,
         published_at=datetime(2025, 6, 4, tzinfo=UTC),
         seo_title="Shipping AI Features to Production",
-        seo_description=(
-            "Evaluation, RAG, and guardrails for customer-facing LLM features."
-        ),
+        seo_description=("Evaluation, RAG, and guardrails for customer-facing LLM features."),
         sort_order=60,
     ),
     ArticleCreate(
@@ -821,8 +816,7 @@ POSTS = [
         published_at=datetime(2026, 4, 15, tzinfo=UTC),
         seo_title="How Powerful Modern AI Really Is",
         seo_description=(
-            "What today's AI can deliver, where it fails, and how leaders "
-            "should invest."
+            "What today's AI can deliver, where it fails, and how leaders should invest."
         ),
         sort_order=70,
     ),
@@ -844,8 +838,7 @@ POSTS = [
         published_at=datetime(2026, 5, 28, tzinfo=UTC),
         seo_title="Agentic AI for Enterprise Automation",
         seo_description=(
-            "Architecture, risks, and a phased roadmap for autonomous agents "
-            "in the enterprise."
+            "Architecture, risks, and a phased roadmap for autonomous agents in the enterprise."
         ),
         sort_order=80,
     ),

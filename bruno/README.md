@@ -38,6 +38,9 @@ These slugs already exist. Use them for Get / List / Patch:
 | Pricing packages | `PACKAGE_SLUG=product-landing-page` |
 | Portfolio | `PROJECT_SLUG=gulf-franchise` |
 | Articles | `ARTICLE_SLUG=zero-trust-modern-saas` |
+| About | singleton page — no slug var |
+| Team | `MEMBER_SLUG=tushar-hossen` |
+| Contact | singleton page — form still posts to `POST /api/v1/leads` |
 | Orders | `ORDER_ID` from Submit Order |
 | Leads | `LEAD_ID` from a public lead submit |
 
@@ -52,6 +55,7 @@ Create requests write a **bruno-demo-*** slug. Delete requests target only those
 | Pricing → Create Package (`bruno-demo-package`) | Pricing → Delete Package |
 | Portfolio → Create Project (`bruno-demo-case`) | Portfolio → Delete Project |
 | Articles → Create Post (`bruno-demo-insight`) | Articles → Delete Post |
+| Team → Create Member (`bruno-demo-member`) | Team → Delete Member |
 
 Do not run Delete Service after an order exists for that service (API returns `409`).
 

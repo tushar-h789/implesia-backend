@@ -1,0 +1,23 @@
+meta {
+  name: Update Member
+  type: http
+  seq: 6
+}
+
+patch {
+  url: {{PRIVATE_BASE_URL}}/api/v1/admin/team/members/{{MEMBER_SLUG}}
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "is_published": true,
+    "role": "Founder and CEO"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

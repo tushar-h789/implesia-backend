@@ -29,8 +29,10 @@ from app.api.deps import get_db  # noqa: E402
 from app.db.base import Base  # noqa: E402
 from app.main import app  # noqa: E402
 from app.models import (  # noqa: E402, F401
+    AboutPage,
     Article,
     ArticlesPage,
+    ContactPage,
     EngagementModel,
     Order,
     PortfolioPage,
@@ -38,6 +40,8 @@ from app.models import (  # noqa: E402, F401
     PricingPackage,
     PricingPage,
     Service,
+    TeamMember,
+    TeamPage,
 )
 from app.models.user import UserRole  # noqa: E402
 from app.schemas.user import UserCreate  # noqa: E402

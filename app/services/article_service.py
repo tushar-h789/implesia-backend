@@ -142,9 +142,7 @@ async def list_articles(
     return list(result.scalars().all()), total
 
 
-async def list_published_articles(
-    db: AsyncSession, *, topic: str | None = None
-) -> list[Article]:
+async def list_published_articles(db: AsyncSession, *, topic: str | None = None) -> list[Article]:
     items, _ = await list_articles(db, 0, 100, published_only=True, topic=topic)
     return items
 
@@ -173,7 +171,7 @@ async def _assert_slug_free(
 async def create_article(db: AsyncSession, payload: ArticleCreate) -> Article:
     slug = _unique_slug(payload.title, payload.slug)
     await _assert_slug_free(db, slug)
-    data = payload.model_dump(mode="json")
+    data = payload.model_dump()
     data["slug"] = slug
     item = Article(**data)
     db.add(item)
@@ -183,7 +181,7 @@ async def create_article(db: AsyncSession, payload: ArticleCreate) -> Article:
 
 
 async def update_article(db: AsyncSession, item: Article, payload: ArticleUpdate) -> Article:
-    data = payload.model_dump(mode="json", exclude_unset=True)
+    data = payload.model_dump(exclude_unset=True)
     if "slug" in data:
         new_slug = _unique_slug(data.get("title", item.title), data["slug"])
         await _assert_slug_free(db, new_slug, exclude_id=item.id)

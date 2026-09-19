@@ -1,0 +1,16 @@
+meta {
+  name: Delete Member
+  type: http
+  seq: 7
+}
+
+delete {
+  url: {{PRIVATE_BASE_URL}}/api/v1/admin/team/members/bruno-demo-member
+  body: none
+  auth: none
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

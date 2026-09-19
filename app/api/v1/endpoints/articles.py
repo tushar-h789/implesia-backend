@@ -86,9 +86,7 @@ async def read_article(db: DbSession, article_ref: str) -> ArticleAdmin:
 
 
 @admin_router.patch("/posts/{article_ref}", response_model=ArticleAdmin)
-async def update_article(
-    db: DbSession, article_ref: str, payload: ArticleUpdate
-) -> ArticleAdmin:
+async def update_article(db: DbSession, article_ref: str, payload: ArticleUpdate) -> ArticleAdmin:
     item = await article_service.get_article_by_ref(db, article_ref)
     updated = await article_service.update_article(db, item, payload)
     return ArticleAdmin.model_validate(updated)

@@ -37,9 +37,7 @@ async def test_public_hides_drafts_and_internal_notes(
     client: AsyncClient, auth_headers: dict[str, str]
 ) -> None:
     await client.patch("/api/v1/admin/articles", json=PAGE_PATCH, headers=auth_headers)
-    created = await client.post(
-        "/api/v1/admin/articles/posts", json=ARTICLE, headers=auth_headers
-    )
+    created = await client.post("/api/v1/admin/articles/posts", json=ARTICLE, headers=auth_headers)
     assert created.status_code == 201, created.text
     assert created.json()["internal_notes"].startswith("Do not show")
 
@@ -78,9 +76,7 @@ async def test_public_hides_drafts_and_internal_notes(
 async def test_admin_crud_and_auth_boundaries(
     client: AsyncClient, auth_headers: dict[str, str], db_session: AsyncSession
 ) -> None:
-    created = await client.post(
-        "/api/v1/admin/articles/posts", json=ARTICLE, headers=auth_headers
-    )
+    created = await client.post("/api/v1/admin/articles/posts", json=ARTICLE, headers=auth_headers)
     assert created.status_code == 201
     admin_get = await client.get(
         "/api/v1/admin/articles/posts/zero-trust-modern-saas", headers=auth_headers
@@ -129,7 +125,5 @@ async def test_duplicate_article_slug_conflicts(
     assert (
         await client.post("/api/v1/admin/articles/posts", json=ARTICLE, headers=auth_headers)
     ).status_code == 201
-    again = await client.post(
-        "/api/v1/admin/articles/posts", json=ARTICLE, headers=auth_headers
-    )
+    again = await client.post("/api/v1/admin/articles/posts", json=ARTICLE, headers=auth_headers)
     assert again.status_code == 409

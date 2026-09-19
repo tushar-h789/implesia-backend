@@ -1,0 +1,37 @@
+meta {
+  name: Create Member
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{PRIVATE_BASE_URL}}/api/v1/admin/team/members
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name": "Bruno Demo Member",
+    "slug": "bruno-demo-member",
+    "role": "Editorial",
+    "bio": "Created from Bruno to prove admin can store a team card, including a private internal note.",
+    "skills": ["Bruno", "Demo"],
+    "is_featured": false,
+    "is_published": true,
+    "sort_order": 999,
+    "internal_notes": "Private note — never returned on public routes."
+  }
+}
+
+script:post-response {
+  const body = res.getBody();
+  if (res.getStatus() === 201 && body.slug) {
+    bru.setEnvVar("MEMBER_SLUG", body.slug);
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
