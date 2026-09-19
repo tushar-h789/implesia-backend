@@ -1,0 +1,43 @@
+meta {
+  name: Create Model
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{PRIVATE_BASE_URL}}/api/v1/admin/pricing/models
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name": "Bruno Demo Model",
+    "slug": "bruno-demo-model",
+    "icon": "explore",
+    "kicker": "2-week intensive",
+    "price_label": "From $1,500",
+    "price_amount": 1500,
+    "currency": "USD",
+    "cadence": "one_time",
+    "subtitle": "Typical for a focused 2-week discovery",
+    "description": "Validate your idea fast with user research, technical feasibility, and a production-ready roadmap.",
+    "inclusions": ["Stakeholder workshops", "Architecture blueprint", "MVP scope & timeline"],
+    "ideal_for": "New products & MVPs",
+    "cta_label": "Discuss this model",
+    "is_published": true,
+    "sort_order": 999
+  }
+}
+
+script:post-response {
+  const body = res.getBody();
+  if (res.getStatus() === 201 && body.slug) {
+    bru.setEnvVar("MODEL_SLUG", body.slug);
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

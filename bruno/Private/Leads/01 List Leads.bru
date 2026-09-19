@@ -1,0 +1,21 @@
+meta {
+  name: List Leads
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{PRIVATE_BASE_URL}}/api/v1/admin/leads
+  body: none
+  auth: none
+}
+
+params:query {
+  page: 1
+  page_size: 20
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

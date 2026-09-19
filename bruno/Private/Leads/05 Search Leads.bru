@@ -1,0 +1,22 @@
+meta {
+  name: Search Leads
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{PRIVATE_BASE_URL}}/api/v1/admin/leads
+  body: none
+  auth: none
+}
+
+params:query {
+  search: acme
+  page: 1
+  page_size: 20
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

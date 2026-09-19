@@ -1,0 +1,16 @@
+meta {
+  name: Get Project
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{PRIVATE_BASE_URL}}/api/v1/admin/portfolio/projects/{{PROJECT_SLUG}}
+  body: none
+  auth: none
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

@@ -1,0 +1,28 @@
+meta {
+  name: Replay Same Idempotency Key
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{BASE_URL}}/api/v1/leads
+  body: json
+  auth: none
+}
+
+headers {
+  Idempotency-Key: bruno-lead-001
+}
+
+body:json {
+  {
+    "full_name": "Jonathan Reid",
+    "email": "j.reid@acme.com",
+    "brief": "We need to modernise a legacy monolith into a cloud-native platform for our product team."
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

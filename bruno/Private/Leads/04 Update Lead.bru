@@ -1,0 +1,23 @@
+meta {
+  name: Update Lead
+  type: http
+  seq: 4
+}
+
+patch {
+  url: {{PRIVATE_BASE_URL}}/api/v1/admin/leads/{{LEAD_ID}}
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "status": "qualified",
+    "internal_notes": "Booked a discovery call from Bruno."
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

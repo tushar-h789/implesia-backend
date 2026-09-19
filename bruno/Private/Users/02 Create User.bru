@@ -1,0 +1,37 @@
+meta {
+  name: Create User
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{PRIVATE_BASE_URL}}/api/v1/users
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "email": "{{EDITOR_EMAIL}}",
+    "full_name": "Bruno Editor",
+    "password": "EditorPass#2026!",
+    "role": "editor",
+    "is_active": true
+  }
+}
+
+script:pre-request {
+  bru.setEnvVar("EDITOR_EMAIL", "editor." + Date.now() + "@implesia.com");
+}
+
+script:post-response {
+  const body = res.getBody();
+  if (res.getStatus() === 201 && body.id) {
+    bru.setEnvVar("USER_ID", body.id);
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

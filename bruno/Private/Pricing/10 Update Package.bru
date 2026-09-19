@@ -1,0 +1,24 @@
+meta {
+  name: Update Package
+  type: http
+  seq: 10
+}
+
+patch {
+  url: {{PRIVATE_BASE_URL}}/api/v1/admin/pricing/packages/{{PACKAGE_SLUG}}
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "price_label": "৳42,000",
+    "price_amount_bdt": 42000,
+    "is_published": true
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

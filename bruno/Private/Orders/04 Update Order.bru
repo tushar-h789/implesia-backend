@@ -1,0 +1,23 @@
+meta {
+  name: Update Order
+  type: http
+  seq: 4
+}
+
+patch {
+  url: {{PRIVATE_BASE_URL}}/api/v1/admin/orders/{{ORDER_ID}}
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "status": "in_progress",
+    "internal_notes": "Assigned from the admin orders page."
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

@@ -1,0 +1,24 @@
+meta {
+  name: Update User
+  type: http
+  seq: 4
+}
+
+patch {
+  url: {{PRIVATE_BASE_URL}}/api/v1/users/{{USER_ID}}
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "full_name": "Bruno Editor (updated)",
+    "role": "viewer",
+    "is_active": true
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

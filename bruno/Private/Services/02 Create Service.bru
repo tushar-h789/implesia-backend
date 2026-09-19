@@ -1,0 +1,95 @@
+meta {
+  name: Create Service
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{PRIVATE_BASE_URL}}/api/v1/admin/services
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name": "Bruno Demo Service",
+    "slug": "bruno-crud-service",
+    "tagline": "Full service-page payload so admin can create every block on /services/{slug}.",
+    "description": "This request is the complete CMS shape for a public service page: hero, metrics, capabilities, deliverables, process, outcomes, related services, FAQs, CTA, and SEO.",
+    "category": "engineering",
+    "icon": "desktop_windows",
+    "engagement_status": "Available",
+    "tech_stack": ["Next.js", "React", "TypeScript", "Node.js", "PostgreSQL"],
+    "hero_metrics": [
+      { "value": "1.2s", "label": "Avg. Load Time" },
+      { "value": "99.9%", "label": "Uptime SLA" }
+    ],
+    "deliver_heading": "What we deliver for web platforms",
+    "deliver_body": "We design and build high-performance web platforms that serve as the digital backbone of modern enterprises. From customer-facing portals to internal dashboards, every layer is architected for reliability, security, and long-term maintainability.",
+    "capabilities": [
+      "Micro-frontend and modular architecture",
+      "Server-side rendering and edge optimization",
+      "Role-based access and enterprise SSO",
+      "Real-time analytics and observability",
+      "WCAG-compliant accessibility standards"
+    ],
+    "deliverables_heading": "What You Receive",
+    "deliverables_kicker": "Included in every engagement",
+    "deliverables": [
+      "Production-ready web application",
+      "Design system and component library",
+      "CI/CD pipeline and deployment docs",
+      "Performance audit and monitoring setup"
+    ],
+    "process_heading": "How we build your web platforms",
+    "process_body": "A proven four-phase framework designed for clarity, velocity, and production-grade outcomes.",
+    "process_steps": [
+      { "title": "Discovery", "description": "Map business goals, user journeys, and technical constraints." },
+      { "title": "Architecture", "description": "Define scalable system design, APIs, and data models." },
+      { "title": "Engineering", "description": "Iterative development with continuous QA and reviews." },
+      { "title": "Launch", "description": "Deploy, monitor, and hand over with full documentation." }
+    ],
+    "outcomes_heading": "Before → After",
+    "outcomes_body": "Enterprise web platforms we build consistently deliver measurable performance, reliability, and team velocity gains.",
+    "outcomes_disclaimer": "Results based on aggregated client engagements. Individual outcomes vary by scope, team, and market conditions.",
+    "outcomes": [
+      { "title": "Faster Releases", "description": "Average CI/CD cycle time reduction post-launch" },
+      { "title": "Less Tech Debt", "description": "Modular architecture reduces rework over 12 months" },
+      { "title": "Conversion Lift", "description": "Median improvement on optimized user flows" }
+    ],
+    "related_heading": "Related services",
+    "related_slugs": ["mobile-apps", "saas-architecture", "ui-ux-design"],
+    "faqs_heading": "Still have questions?",
+    "faqs_body": "Our senior architects respond within 24 hours on business days.",
+    "faqs": [
+      {
+        "question": "How long does a typical web platform project take?",
+        "answer": "Most enterprise web platforms take 12–20 weeks depending on scope. We start with a 2-week discovery sprint to define architecture, milestones, and a realistic timeline before development begins."
+      },
+      {
+        "question": "Do you work with our existing design or engineering team?",
+        "answer": "Yes. We embed with your team, share the same backlog, and keep architecture decisions in a written brief so handover stays clean."
+      }
+    ],
+    "cta_heading": "Ready to architect your digital future?",
+    "cta_body": "Schedule a confidential strategy session with our senior architects to discuss your project requirements and roadmap.",
+    "cta_highlights": ["Free Strategy Call", "NDA Available", "Senior Engineers"],
+    "seo_title": "Bruno Demo Service | Implesia IT",
+    "seo_description": "Full CMS payload matching a public /services/{slug} page.",
+    "is_published": true,
+    "sort_order": 999
+  }
+}
+
+script:post-response {
+  const body = res.getBody();
+  if (res.getStatus() === 201 && body.id) {
+    bru.setEnvVar("SERVICE_ID", body.id);
+    bru.setEnvVar("SERVICE_SLUG", body.slug);
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

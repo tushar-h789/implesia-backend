@@ -1,0 +1,24 @@
+meta {
+  name: Update Page
+  type: http
+  seq: 2
+}
+
+patch {
+  url: {{PRIVATE_BASE_URL}}/api/v1/admin/pricing
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "hero_heading": "Clear commercial paths. No guesswork.",
+    "cta_heading": "Get a tailored investment estimate",
+    "bdt_per_usd": 123
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

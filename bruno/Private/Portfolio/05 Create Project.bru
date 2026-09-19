@@ -1,0 +1,43 @@
+meta {
+  name: Create Project
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{PRIVATE_BASE_URL}}/api/v1/admin/portfolio/projects
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name": "Bruno Demo Case",
+    "slug": "bruno-demo-case",
+    "tagline": "Demo case study for admin create",
+    "category": "web",
+    "year": 2026,
+    "status": "Completed",
+    "summary": "Created from Bruno to prove admin can store a full portfolio card, including a private internal note.",
+    "tech_stack": ["Next.js", "FastAPI"],
+    "live_url": "https://implesia.com",
+    "live_label": "implesia.com",
+    "outcomes": [{ "title": "Live", "description": "Production deployment" }],
+    "is_featured": false,
+    "is_published": true,
+    "sort_order": 999,
+    "internal_notes": "Private note — never returned on public routes."
+  }
+}
+
+script:post-response {
+  const body = res.getBody();
+  if (res.getStatus() === 201 && body.slug) {
+    bru.setEnvVar("PROJECT_SLUG", body.slug);
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

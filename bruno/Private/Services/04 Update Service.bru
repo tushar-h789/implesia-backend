@@ -1,0 +1,29 @@
+meta {
+  name: Update Service
+  type: http
+  seq: 4
+}
+
+patch {
+  url: {{PRIVATE_BASE_URL}}/api/v1/admin/services/{{SERVICE_SLUG}}
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "tagline": "Updated tagline for this service page.",
+    "engagement_status": "Available",
+    "hero_metrics": [
+      { "value": "1.0s", "label": "Avg. Load Time" },
+      { "value": "99.95%", "label": "Uptime SLA" }
+    ],
+    "cta_body": "Updated CTA copy for the strategy session.",
+    "is_published": true
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

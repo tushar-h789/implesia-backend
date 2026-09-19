@@ -1,0 +1,52 @@
+meta {
+  name: Create Package
+  type: http
+  seq: 9
+}
+
+post {
+  url: {{PRIVATE_BASE_URL}}/api/v1/admin/pricing/packages
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name": "Bruno Demo Package",
+    "slug": "bruno-demo-package",
+    "icon": "rocket_launch",
+    "tagline": "Single offer · conversion-focused",
+    "price_label": "৳40,000",
+    "price_amount_bdt": 40000,
+    "timeline_label": "7–10 working days",
+    "bugfix_label": "14-day bug fix",
+    "audience": "Product launches & campaigns",
+    "description": "One high-converting page to present an offer, build trust, and drive enquiries or purchases.",
+    "dashboard_heading": "No admin dashboard",
+    "dashboard_body": "Public landing page only. Enquiries go to email or WhatsApp—no staff login panel.",
+    "inclusions": [
+      "1 mobile-first custom landing page",
+      "Hero, benefits, proof, FAQ, and primary CTA",
+      "Lead form or WhatsApp / buy CTA"
+    ],
+    "exclusions": [
+      "Admin dashboard or staff login",
+      "Payment gateway / checkout"
+    ],
+    "cta_label": "Enquire about Bruno Demo Package",
+    "is_published": true,
+    "sort_order": 999
+  }
+}
+
+script:post-response {
+  const body = res.getBody();
+  if (res.getStatus() === 201 && body.slug) {
+    bru.setEnvVar("PACKAGE_SLUG", body.slug);
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

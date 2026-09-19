@@ -1,0 +1,16 @@
+meta {
+  name: Order Stats
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{PRIVATE_BASE_URL}}/api/v1/admin/orders/stats
+  body: none
+  auth: none
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

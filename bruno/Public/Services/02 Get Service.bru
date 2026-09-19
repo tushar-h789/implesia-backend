@@ -1,0 +1,16 @@
+meta {
+  name: Get Service
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{BASE_URL}}/api/v1/services/{{SERVICE_SLUG}}
+  body: none
+  auth: none
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

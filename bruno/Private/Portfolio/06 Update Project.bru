@@ -1,0 +1,23 @@
+meta {
+  name: Update Project
+  type: http
+  seq: 6
+}
+
+patch {
+  url: {{PRIVATE_BASE_URL}}/api/v1/admin/portfolio/projects/{{PROJECT_SLUG}}
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "status": "Completed",
+    "is_published": true
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

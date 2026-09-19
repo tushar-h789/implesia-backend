@@ -1,0 +1,23 @@
+meta {
+  name: Update Model
+  type: http
+  seq: 6
+}
+
+patch {
+  url: {{PRIVATE_BASE_URL}}/api/v1/admin/pricing/models/{{MODEL_SLUG}}
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "price_label": "From $1,800",
+    "is_published": true
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

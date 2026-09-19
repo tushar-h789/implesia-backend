@@ -1,0 +1,16 @@
+meta {
+  name: Delete Package
+  type: http
+  seq: 12
+}
+
+delete {
+  url: {{PRIVATE_BASE_URL}}/api/v1/admin/pricing/packages/bruno-demo-package
+  body: none
+  auth: none
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
