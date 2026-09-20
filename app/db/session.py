@@ -6,7 +6,12 @@ from app.core.config import settings
 
 _pool_options: dict[str, object] = {}
 if not settings.database_url.startswith("sqlite"):
-    _pool_options = {"pool_pre_ping": True, "pool_size": 10, "max_overflow": 20}
+    pool_size = 2 if settings.is_production else 10
+    _pool_options = {
+        "pool_pre_ping": True,
+        "pool_size": pool_size,
+        "max_overflow": pool_size,
+    }
 
 engine = create_async_engine(
     settings.database_url,

@@ -1,7 +1,7 @@
 from functools import lru_cache
 from typing import Annotated, Literal
 
-from pydantic import Field, PostgresDsn, field_validator
+from pydantic import AliasChoices, Field, PostgresDsn, field_validator
 from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
 
 Environment = Literal["local", "test", "staging", "production"]
@@ -17,6 +17,7 @@ class Settings(BaseSettings):
         env_file_encoding="utf-8",
         extra="ignore",
         case_sensitive=False,
+        populate_by_name=True,
     )
 
     # Application
@@ -40,7 +41,10 @@ class Settings(BaseSettings):
     postgres_user: str = "implesia"
     postgres_password: str = "implesia"
     postgres_db: str = "implesia"
-    database_url_override: str | None = None
+    database_url_override: str | None = Field(
+        default=None,
+        validation_alias=AliasChoices("DATABASE_URL_OVERRIDE", "DATABASE_URL"),
+    )
 
     # Redis
     redis_url: str = "redis://localhost:6379/0"
@@ -77,15 +81,17 @@ class Settings(BaseSettings):
     @property
     def database_url(self) -> str:
         if self.database_url_override:
-            return self.database_url_override
-        return str(
-            PostgresDsn.build(
-                scheme="postgresql+asyncpg",
-                username=self.postgres_user,
-                password=self.postgres_password,
-                host=self.postgres_host,
-                port=self.postgres_port,
-                path=self.postgres_db,
+            return _asyncpg_url(self.database_url_override)
+        return _asyncpg_url(
+            str(
+                PostgresDsn.build(
+                    scheme="postgresql+asyncpg",
+                    username=self.postgres_user,
+                    password=self.postgres_password,
+                    host=self.postgres_host,
+                    port=self.postgres_port,
+                    path=self.postgres_db,
+                )
             )
         )
 
@@ -100,6 +106,18 @@ class Settings(BaseSettings):
     @property
     def turnstile_enabled(self) -> bool:
         return bool(self.turnstile_secret_key)
+
+
+def _asyncpg_url(url: str) -> str:
+    if url.startswith("postgres://"):
+        url = "postgresql+asyncpg://" + url.removeprefix("postgres://")
+    elif url.startswith("postgresql://"):
+        url = "postgresql+asyncpg://" + url.removeprefix("postgresql://")
+    if url.startswith("postgresql+asyncpg://") and "ssl=" not in url:
+        host = url.split("@")[-1].split("/")[0].split(":")[0]
+        if host not in {"localhost", "127.0.0.1", "postgres"}:
+            url = f"{url}{'&' if '?' in url else '?'}ssl=require"
+    return url
 
 
 @lru_cache

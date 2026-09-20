@@ -18,7 +18,9 @@ COPY alembic ./alembic
 COPY app ./app
 COPY scripts ./scripts
 
-RUN useradd --create-home --uid 1000 appuser && chown -R appuser:appuser /srv
+RUN chmod +x /srv/scripts/start.sh \
+    && useradd --create-home --uid 1000 appuser \
+    && chown -R appuser:appuser /srv
 USER appuser
 
 EXPOSE 8000
@@ -26,9 +28,4 @@ EXPOSE 8000
 HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
     CMD curl -fsS http://localhost:8000/health/live || exit 1
 
-CMD ["gunicorn", "app.main:app", \
-     "--worker-class", "uvicorn.workers.UvicornWorker", \
-     "--workers", "4", \
-     "--bind", "0.0.0.0:8000", \
-     "--access-logfile", "-", \
-     "--error-logfile", "-"]
+CMD ["sh", "scripts/start.sh"]
