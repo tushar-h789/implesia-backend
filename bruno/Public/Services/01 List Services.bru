@@ -12,10 +12,67 @@ get {
 
 params:query {
   page: 1
-  page_size: 20
+  page_size: 50
+}
+
+headers {
+  Accept: application/json
+}
+
+docs {
+  # GET /api/v1/services
+
+  Published rows only. This is the `/services` grid.
+
+  Each item is the **full** Service row (hero, process, FAQs, CTA), not a card subset.
+
+  **Expected:** `200` `{ items, total, page, page_size }`
+
+  After a 200 this request writes `SERVICE_ID` from `SERVICE_SLUG` (default `web-platforms`) so **Get Service** works without pasting a UUID.
+}
+
+script:post-response {
+  const body = res.getBody();
+  if (res.getStatus() !== 200 || !body || !Array.isArray(body.items)) return;
+
+  const wanted = (bru.getEnvVar("SERVICE_SLUG") || "web-platforms").trim();
+  const match = body.items.find((item) => item.slug === wanted) || body.items[0];
+  if (match && match.id) {
+    bru.setEnvVar("SERVICE_ID", match.id);
+    if (match.slug) bru.setEnvVar("SERVICE_SLUG", match.slug);
+  }
+}
+
+tests {
+  test("lists published services", function () {
+    expect(res.getStatus()).to.equal(200);
+    const body = res.getBody();
+    expect(body.items).to.be.an("array");
+    expect(body.total).to.be.a("number");
+    expect(body.page).to.equal(1);
+  });
+
+  test("each item has the public page fields", function () {
+    const first = res.getBody().items[0];
+    expect(first).to.be.an("object");
+    expect(first.id).to.be.a("string");
+    expect(first.slug).to.be.a("string");
+    expect(first.name).to.be.a("string");
+    expect(first.tagline).to.be.a("string");
+    expect(first.tech_stack).to.be.an("array");
+    expect(first.hero_metrics).to.be.an("array");
+    expect(first.process_steps).to.be.an("array");
+    expect(first.outcomes).to.be.an("array");
+    expect(first.faqs).to.be.an("array");
+    expect(first.cta_highlights).to.be.an("array");
+  });
+}
+
+assert {
+  res.status: eq 200
 }
 
 settings {
   encodeUrl: true
-  timeout: 0
+  timeout: 25000
 }

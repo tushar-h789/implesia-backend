@@ -1,0 +1,40 @@
+meta {
+  name: Get Service by Slug
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{BASE_URL}}/api/v1/services/{{SERVICE_SLUG}}
+  body: none
+  auth: none
+}
+
+headers {
+  Accept: application/json
+}
+
+docs {
+  # Negative — GET /api/v1/services/web-platforms
+
+  This is the URL people try first. The API rejects it.
+
+  **Expected:** `422` — `{service_id}` must be a UUID.
+
+  Use **List Services** → copy `id` → **Get Service**.
+}
+
+tests {
+  test("slug in the path is rejected", function () {
+    expect(res.getStatus()).to.equal(422);
+  });
+}
+
+assert {
+  res.status: eq 422
+}
+
+settings {
+  encodeUrl: true
+  timeout: 25000
+}

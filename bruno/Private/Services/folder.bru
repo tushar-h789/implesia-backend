@@ -2,3 +2,16 @@ meta {
   name: Services
   seq: 4
 }
+
+docs {
+  Staff CMS for every block on `/services/{slug}`.
+
+  Run **Public / Auth / Login** first. The collection script attaches `ACCESS_TOKEN`.
+
+  | Request | Uses |
+  |---|---|
+  | List / Get Service | `SERVICE_ID` — seeded row (`web-platforms`) |
+  | Create → Get Demo → Update → Delete | `DEMO_SERVICE_ID` (`bruno-crud-service`) |
+
+  List also stores `SERVICE_ID` from `SERVICE_SLUG` so Get works on Local or Production.
+}

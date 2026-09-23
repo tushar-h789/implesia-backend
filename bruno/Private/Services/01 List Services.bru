@@ -7,15 +7,54 @@ meta {
 get {
   url: {{PRIVATE_BASE_URL}}/api/v1/admin/services
   body: none
-  auth: none
+  auth: bearer
 }
 
 params:query {
   page: 1
-  page_size: 20
+  page_size: 50
+}
+
+auth:bearer {
+  token: {{ACCESS_TOKEN}}
+}
+
+headers {
+  Accept: application/json
+}
+
+docs {
+  # GET /api/v1/admin/services
+
+  Editor+. Includes drafts.
+
+  **Expected:** `200`. Writes `SERVICE_ID` from `SERVICE_SLUG`.
+}
+
+script:post-response {
+  const body = res.getBody();
+  if (res.getStatus() !== 200 || !body || !Array.isArray(body.items)) return;
+
+  const wanted = (bru.getEnvVar("SERVICE_SLUG") || "web-platforms").trim();
+  const match = body.items.find((item) => item.slug === wanted) || body.items[0];
+  if (match && match.id) {
+    bru.setEnvVar("SERVICE_ID", match.id);
+    if (match.slug) bru.setEnvVar("SERVICE_SLUG", match.slug);
+  }
+}
+
+tests {
+  test("lists admin services", function () {
+    expect(res.getStatus()).to.equal(200);
+    expect(res.getBody().items).to.be.an("array");
+  });
+}
+
+assert {
+  res.status: eq 200
 }
 
 settings {
   encodeUrl: true
-  timeout: 0
+  timeout: 25000
 }

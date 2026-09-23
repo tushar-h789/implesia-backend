@@ -1,5 +1,6 @@
 from functools import lru_cache
 from typing import Annotated, Literal
+from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 
 from pydantic import AliasChoices, Field, PostgresDsn, field_validator
 from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
@@ -113,11 +114,24 @@ def _asyncpg_url(url: str) -> str:
         url = "postgresql+asyncpg://" + url.removeprefix("postgres://")
     elif url.startswith("postgresql://"):
         url = "postgresql+asyncpg://" + url.removeprefix("postgresql://")
-    if url.startswith("postgresql+asyncpg://") and "ssl=" not in url:
-        host = url.split("@")[-1].split("/")[0].split(":")[0]
-        if host not in {"localhost", "127.0.0.1", "postgres"}:
-            url = f"{url}{'&' if '?' in url else '?'}ssl=require"
-    return url
+    if not url.startswith("postgresql+asyncpg://"):
+        return url
+
+    parts = urlsplit(url)
+    query = dict(parse_qsl(parts.query, keep_blank_values=True))
+    sslmode = query.pop("sslmode", None)
+    query.pop("channel_binding", None)
+    if "ssl" not in query:
+        host = (parts.hostname or "").lower()
+        if sslmode not in {"disable", "allow"} and host not in {
+            "localhost",
+            "127.0.0.1",
+            "postgres",
+        }:
+            query["ssl"] = "require"
+    return urlunsplit(
+        (parts.scheme, parts.netloc, parts.path, urlencode(query), parts.fragment)
+    )
 
 
 @lru_cache

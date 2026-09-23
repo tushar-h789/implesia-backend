@@ -65,11 +65,22 @@ async def notify_team_of_lead(lead: Lead) -> None:
     )
 
 
+def _order_target_name(order: Order) -> str:
+    if order.service is not None:
+        return order.service.name
+    if order.package is not None:
+        return order.package.name
+    if order.model is not None:
+        return order.model.name
+    return "a catalogue item"
+
+
 def _order_summary(order: Order) -> str:
-    service_name = order.service.name if order.service else str(order.service_id)
     return "\n".join(
         [
-            f"Service:      {service_name}",
+            f"Service:      {order.service.name if order.service else '-'}",
+            f"Package:      {order.package.name if order.package else '-'}",
+            f"Model:        {order.model.name if order.model else '-'}",
             f"Name:         {order.full_name}",
             f"Email:        {order.email}",
             f"Phone:        {order.phone or '-'}",
@@ -84,16 +95,16 @@ def _order_summary(order: Order) -> str:
 
 async def notify_team_of_order(order: Order) -> None:
     """Best-effort inbox alert. Uses free Gmail SMTP when configured; otherwise logs."""
-    service_name = order.service.name if order.service else "a service"
+    target = _order_target_name(order)
     await send_email(
         to=settings.lead_notification_recipients,
-        subject=f"New service order — {service_name} ({order.full_name})",
+        subject=f"New service order — {target} ({order.full_name})",
         body=_order_summary(order),
     )
 
 
 async def acknowledge_order(order: Order) -> None:
-    service_name = order.service.name if order.service else "your selected service"
+    service_name = _order_target_name(order)
     body = (
         f"Hi {order.full_name},\n\n"
         f"Thank you for ordering {service_name}. Our team has the request and will "

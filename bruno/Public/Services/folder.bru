@@ -2,3 +2,19 @@ meta {
   name: Services
   seq: 4
 }
+
+auth {
+  mode: none
+}
+
+docs {
+  Public catalogue for `/services` and `/services/{slug}`.
+
+  **No JWT.** The site never sends a staff token here.
+
+  ## How the frontend loads a detail page
+  1. `GET /api/v1/services?page=1&page_size=50` — find the row by `slug`
+  2. `GET /api/v1/services/{id}` — hydrate the full CMS row
+
+  A slug in the path (`/api/v1/services/web-platforms`) is **422**. The API only accepts a UUID.
+}

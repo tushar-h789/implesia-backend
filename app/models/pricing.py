@@ -1,10 +1,13 @@
 from __future__ import annotations
 
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from sqlalchemy import Boolean, Integer, String, Text
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.types import JSON
+
+if TYPE_CHECKING:
+    from app.models.order import Order
 
 from app.db.base import Base, TimestampMixin, UUIDPrimaryKeyMixin
 
@@ -81,6 +84,7 @@ class EngagementModel(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     cta_label: Mapped[str] = mapped_column(String(80), nullable=False, default="Discuss this model")
     is_published: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False, index=True)
     sort_order: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    orders: Mapped[list[Order]] = relationship("Order", back_populates="model")
 
     def __repr__(self) -> str:
         return f"<EngagementModel {self.slug}>"
@@ -109,6 +113,7 @@ class PricingPackage(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     cta_label: Mapped[str] = mapped_column(String(120), nullable=False, default="")
     is_published: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False, index=True)
     sort_order: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    orders: Mapped[list[Order]] = relationship("Order", back_populates="package")
 
     def __repr__(self) -> str:
         return f"<PricingPackage {self.slug}>"

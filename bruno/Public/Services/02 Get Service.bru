@@ -10,7 +10,52 @@ get {
   auth: none
 }
 
+headers {
+  Accept: application/json
+}
+
+docs {
+  # GET /api/v1/services/{id}
+
+  Full CMS row for `/services/{slug}`. Path must be a **UUID**.
+
+  Run **List Services** first if `SERVICE_ID` is empty or 404 — that request copies the id for `SERVICE_SLUG`.
+
+  **Expected:** `200` with hero, overview, process, outcomes, related, FAQs, CTA.
+
+  | Status | Meaning |
+  |---|---|
+  | 200 | Published service |
+  | 404 | Unknown id or draft |
+  | 422 | Path is a slug, not a UUID |
+}
+
+tests {
+  test("returns the full service page", function () {
+    expect(res.getStatus()).to.equal(200);
+    const body = res.getBody();
+    expect(body.id).to.equal(bru.getEnvVar("SERVICE_ID"));
+    expect(body.slug).to.be.a("string");
+    expect(body.name).to.be.a("string");
+    expect(body.tagline).to.be.a("string");
+    expect(body.description).to.be.a("string");
+    expect(body.tech_stack).to.be.an("array");
+    expect(body.hero_metrics).to.be.an("array");
+    expect(body.capabilities).to.be.an("array");
+    expect(body.deliverables).to.be.an("array");
+    expect(body.process_steps).to.be.an("array");
+    expect(body.outcomes).to.be.an("array");
+    expect(body.related_slugs).to.be.an("array");
+    expect(body.faqs).to.be.an("array");
+    expect(body.cta_highlights).to.be.an("array");
+  });
+}
+
+assert {
+  res.status: eq 200
+}
+
 settings {
   encodeUrl: true
-  timeout: 0
+  timeout: 25000
 }

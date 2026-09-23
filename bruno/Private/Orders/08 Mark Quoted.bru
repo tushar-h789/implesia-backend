@@ -1,0 +1,23 @@
+meta {
+  name: Mark Quoted
+  type: http
+  seq: 8
+}
+
+patch {
+  url: {{PRIVATE_BASE_URL}}/api/v1/admin/orders/{{ORDER_ID}}
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "status": "quoted",
+    "internal_notes": "Sent the commercial quote. Waiting for a yes."
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

@@ -1,0 +1,44 @@
+meta {
+  name: Get Demo Service
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{PRIVATE_BASE_URL}}/api/v1/admin/services/{{DEMO_SERVICE_ID}}
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{ACCESS_TOKEN}}
+}
+
+headers {
+  Accept: application/json
+}
+
+docs {
+  # GET /api/v1/admin/services/{DEMO_SERVICE_ID}
+
+  Read the row **Create Service** just wrote. Run Create first.
+
+  **Expected:** `200`
+}
+
+tests {
+  test("returns the demo service", function () {
+    expect(res.getStatus()).to.equal(200);
+    expect(res.getBody().id).to.equal(bru.getEnvVar("DEMO_SERVICE_ID"));
+    expect(res.getBody().slug).to.equal("bruno-crud-service");
+  });
+}
+
+assert {
+  res.status: eq 200
+}
+
+settings {
+  encodeUrl: true
+  timeout: 25000
+}

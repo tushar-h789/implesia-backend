@@ -7,7 +7,16 @@ meta {
 post {
   url: {{PRIVATE_BASE_URL}}/api/v1/admin/services
   body: json
-  auth: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{ACCESS_TOKEN}}
+}
+
+headers {
+  Content-Type: application/json
+  Accept: application/json
 }
 
 body:json {
@@ -49,13 +58,13 @@ body:json {
       { "title": "Engineering", "description": "Iterative development with continuous QA and reviews." },
       { "title": "Launch", "description": "Deploy, monitor, and hand over with full documentation." }
     ],
-    "outcomes_heading": "Before → After",
+    "outcomes_heading": "Outcomes that move the needle",
     "outcomes_body": "Enterprise web platforms we build consistently deliver measurable performance, reliability, and team velocity gains.",
     "outcomes_disclaimer": "Results based on aggregated client engagements. Individual outcomes vary by scope, team, and market conditions.",
     "outcomes": [
-      { "title": "Faster Releases", "description": "Average CI/CD cycle time reduction post-launch" },
-      { "title": "Less Tech Debt", "description": "Modular architecture reduces rework over 12 months" },
-      { "title": "Conversion Lift", "description": "Median improvement on optimized user flows" }
+      { "title": "Faster Releases", "description": "Average CI/CD cycle time reduction post-launch", "value": "3×" },
+      { "title": "Less Tech Debt", "description": "Modular architecture reduces rework over 12 months", "value": "40%" },
+      { "title": "Conversion Lift", "description": "Median improvement on optimized user flows", "value": "2.1×" }
     ],
     "related_heading": "Related services",
     "related_slugs": ["mobile-apps", "saas-architecture", "ui-ux-design"],
@@ -81,14 +90,37 @@ body:json {
   }
 }
 
+docs {
+  # POST /api/v1/admin/services
+
+  Creates every block the public detail page can render.
+
+  **Expected:** `201`. Writes `DEMO_SERVICE_ID`.
+
+  `409` means `bruno-crud-service` already exists — run **Delete Service** first.
+}
+
 script:post-response {
   const body = res.getBody();
-  if (res.getStatus() === 201 && body.id) {
+  if ((res.getStatus() === 201 || res.getStatus() === 200) && body && body.id) {
     bru.setEnvVar("DEMO_SERVICE_ID", body.id);
   }
 }
 
+tests {
+  test("creates the full CMS row", function () {
+    expect(res.getStatus()).to.equal(201);
+    const body = res.getBody();
+    expect(body.slug).to.equal("bruno-crud-service");
+    expect(body.process_steps).to.have.lengthOf(4);
+    expect(body.process_steps[0].title).to.equal("Discovery");
+    expect(body.outcomes[0].value).to.equal("3×");
+    expect(body.faqs).to.have.lengthOf(2);
+    expect(body.cta_highlights).to.include("NDA Available");
+  });
+}
+
 settings {
   encodeUrl: true
-  timeout: 0
+  timeout: 25000
 }

@@ -1,0 +1,39 @@
+meta {
+  name: Submit Model Order
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{BASE_URL}}/api/v1/orders
+  body: json
+  auth: none
+}
+
+headers {
+  Idempotency-Key: bruno-order-model-001
+}
+
+body:json {
+  {
+    "model_id": "{{MODEL_ID}}",
+    "full_name": "Jonathan Reid",
+    "email": "j.reid@acme.com",
+    "phone": "+44 20 7946 0000",
+    "organisation": "Acme Corporation",
+    "message": "We want to discuss the Discovery Sprint engagement model for a new product.",
+    "source_page": "/pricing"
+  }
+}
+
+script:post-response {
+  const body = res.getBody();
+  if (res.getStatus() === 201 && body.id) {
+    bru.setEnvVar("ORDER_ID", body.id);
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

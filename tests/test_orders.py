@@ -1,5 +1,6 @@
 from httpx import AsyncClient
 
+from tests.test_pricing import MODEL, PACKAGE
 from tests.test_services import VALID_SERVICE
 
 VALID_ORDER = {
@@ -46,7 +47,7 @@ async def test_cannot_order_unpublished_service(
         "/api/v1/orders", json={**VALID_ORDER, "service_id": created.json()["id"]}
     )
     assert response.status_code == 400
-    assert response.json()["error"]["code"] == "service_unavailable"
+    assert response.json()["error"]["code"] == "catalog_unavailable"
 
 
 async def test_order_idempotency(client: AsyncClient, auth_headers: dict[str, str]) -> None:
@@ -88,3 +89,99 @@ async def test_cannot_delete_service_with_orders(
 
 async def test_listing_orders_requires_auth(client: AsyncClient) -> None:
     assert (await client.get("/api/v1/admin/orders")).status_code == 401
+
+
+async def test_submit_order_for_published_package(
+    client: AsyncClient, auth_headers: dict[str, str]
+) -> None:
+    created = await client.post(
+        "/api/v1/admin/pricing/packages", json=PACKAGE, headers=auth_headers
+    )
+    assert created.status_code == 201, created.text
+    package_id = created.json()["id"]
+
+    response = await client.post("/api/v1/orders", json={**VALID_ORDER, "package_id": package_id})
+    assert response.status_code == 201, response.text
+
+    inbox = await client.get(
+        "/api/v1/admin/orders", params={"package_id": package_id}, headers=auth_headers
+    )
+    assert inbox.status_code == 200
+    assert inbox.json()["total"] == 1
+    assert inbox.json()["items"][0]["package"]["slug"] == "product-landing-page"
+    assert inbox.json()["items"][0]["service"] is None
+
+
+async def test_submit_order_for_published_model(
+    client: AsyncClient, auth_headers: dict[str, str]
+) -> None:
+    created = await client.post("/api/v1/admin/pricing/models", json=MODEL, headers=auth_headers)
+    model_id = created.json()["id"]
+    response = await client.post("/api/v1/orders", json={**VALID_ORDER, "model_id": model_id})
+    assert response.status_code == 201, response.text
+    detail = await client.get(
+        f"/api/v1/admin/orders/{response.json()['id']}", headers=auth_headers
+    )
+    assert detail.json()["model"]["slug"] == "discovery-sprint"
+
+
+async def test_cannot_order_unpublished_package(
+    client: AsyncClient, auth_headers: dict[str, str]
+) -> None:
+    created = await client.post(
+        "/api/v1/admin/pricing/packages",
+        json={**PACKAGE, "is_published": False},
+        headers=auth_headers,
+    )
+    response = await client.post(
+        "/api/v1/orders", json={**VALID_ORDER, "package_id": created.json()["id"]}
+    )
+    assert response.status_code == 400
+    assert response.json()["error"]["code"] == "catalog_unavailable"
+
+
+async def test_order_requires_a_catalog_target(client: AsyncClient) -> None:
+    response = await client.post("/api/v1/orders", json=VALID_ORDER)
+    assert response.status_code == 422
+
+
+async def test_admin_can_log_manual_order(
+    client: AsyncClient, auth_headers: dict[str, str]
+) -> None:
+    service_id = await _publish_service(client, auth_headers)
+    created = await client.post(
+        "/api/v1/admin/orders",
+        json={**VALID_ORDER, "service_id": service_id, "source_page": "whatsapp"},
+        headers=auth_headers,
+    )
+    assert created.status_code == 201, created.text
+    assert created.json()["status"] == "new"
+    assert created.json()["service"]["id"] == service_id
+
+
+async def test_admin_can_mark_order_quoted(
+    client: AsyncClient, auth_headers: dict[str, str]
+) -> None:
+    service_id = await _publish_service(client, auth_headers)
+    created = await client.post("/api/v1/orders", json={**VALID_ORDER, "service_id": service_id})
+    updated = await client.patch(
+        f"/api/v1/admin/orders/{created.json()['id']}",
+        json={"status": "quoted", "internal_notes": "Sent the Discovery quote."},
+        headers=auth_headers,
+    )
+    assert updated.status_code == 200
+    assert updated.json()["status"] == "quoted"
+
+
+async def test_cannot_delete_package_with_orders(
+    client: AsyncClient, auth_headers: dict[str, str]
+) -> None:
+    created = await client.post(
+        "/api/v1/admin/pricing/packages", json=PACKAGE, headers=auth_headers
+    )
+    package_id = created.json()["id"]
+    await client.post("/api/v1/orders", json={**VALID_ORDER, "package_id": package_id})
+    deleted = await client.delete(
+        f"/api/v1/admin/pricing/packages/{package_id}", headers=auth_headers
+    )
+    assert deleted.status_code == 409

@@ -15,6 +15,6 @@
   ],
   "vars": {
     // Set this to the FastAPI origin after you host it, e.g. https://implesia-api.onrender.com
-    "ORIGIN": ""
+    "ORIGIN": "https://implesia-api.onrender.com"
   }
 }

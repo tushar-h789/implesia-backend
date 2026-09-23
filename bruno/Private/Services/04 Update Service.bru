@@ -1,29 +1,61 @@
 meta {
   name: Update Service
   type: http
-  seq: 4
+  seq: 5
 }
 
 patch {
-  url: {{PRIVATE_BASE_URL}}/api/v1/admin/services/{{SERVICE_ID}}
+  url: {{PRIVATE_BASE_URL}}/api/v1/admin/services/{{DEMO_SERVICE_ID}}
   body: json
-  auth: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{ACCESS_TOKEN}}
+}
+
+headers {
+  Content-Type: application/json
+  Accept: application/json
 }
 
 body:json {
   {
-    "tagline": "Updated tagline for this service page.",
+    "tagline": "Updated tagline for the Bruno demo service page.",
     "engagement_status": "Available",
     "hero_metrics": [
       { "value": "1.0s", "label": "Avg. Load Time" },
       { "value": "99.95%", "label": "Uptime SLA" }
+    ],
+    "outcomes": [
+      { "title": "Faster Releases", "description": "Average CI/CD cycle time reduction post-launch", "value": "4×" }
     ],
     "cta_body": "Updated CTA copy for the strategy session.",
     "is_published": true
   }
 }
 
+docs {
+  # PATCH /api/v1/admin/services/{id}
+
+  Patches the **demo** row (`DEMO_SERVICE_ID`), never the live `web-platforms` id.
+
+  Run **Create Service** first. Send only fields you want to change.
+
+  **Expected:** `200`
+}
+
+tests {
+  test("updates the demo service", function () {
+    expect(res.getStatus()).to.equal(200);
+    const body = res.getBody();
+    expect(body.id).to.equal(bru.getEnvVar("DEMO_SERVICE_ID"));
+    expect(body.tagline).to.include("Updated tagline");
+    expect(body.outcomes[0].value).to.equal("4×");
+  });
+}
+
 settings {
   encodeUrl: true
-  timeout: 0
+  timeout: 25000
 }

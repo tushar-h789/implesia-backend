@@ -1,0 +1,45 @@
+meta {
+  name: Search Services
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{BASE_URL}}/api/v1/services
+  body: none
+  auth: none
+}
+
+params:query {
+  page: 1
+  page_size: 50
+  search: web
+}
+
+headers {
+  Accept: application/json
+}
+
+docs {
+  # GET /api/v1/services?search=web
+
+  Same list, filtered. The public grid search box uses this.
+
+  **Expected:** `200`. Every item still has the full Service shape.
+}
+
+tests {
+  test("search returns a page", function () {
+    expect(res.getStatus()).to.equal(200);
+    expect(res.getBody().items).to.be.an("array");
+  });
+}
+
+assert {
+  res.status: eq 200
+}
+
+settings {
+  encodeUrl: true
+  timeout: 25000
+}

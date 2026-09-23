@@ -1,0 +1,39 @@
+meta {
+  name: Submit Package Order
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{BASE_URL}}/api/v1/orders
+  body: json
+  auth: none
+}
+
+headers {
+  Idempotency-Key: bruno-order-package-001
+}
+
+body:json {
+  {
+    "package_id": "{{PACKAGE_ID}}",
+    "full_name": "Jonathan Reid",
+    "email": "j.reid@acme.com",
+    "phone": "+44 20 7946 0000",
+    "organisation": "Acme Corporation",
+    "message": "We want the Product Landing Page package. Please confirm timeline and kickoff.",
+    "source_page": "/pricing"
+  }
+}
+
+script:post-response {
+  const body = res.getBody();
+  if (res.getStatus() === 201 && body.id) {
+    bru.setEnvVar("ORDER_ID", body.id);
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

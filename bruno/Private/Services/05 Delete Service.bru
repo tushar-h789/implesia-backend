@@ -1,16 +1,41 @@
 meta {
   name: Delete Service
   type: http
-  seq: 5
+  seq: 6
 }
 
 delete {
   url: {{PRIVATE_BASE_URL}}/api/v1/admin/services/{{DEMO_SERVICE_ID}}
   body: none
-  auth: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{ACCESS_TOKEN}}
+}
+
+headers {
+  Accept: application/json
+}
+
+docs {
+  # DELETE /api/v1/admin/services/{id}
+
+  Deletes `DEMO_SERVICE_ID` only. Do not point this at `SERVICE_ID`.
+
+  `409` means an order still references the row.
+
+  **Expected:** `200` `{ "message": "Service deleted" }`
+}
+
+tests {
+  test("deletes the demo service", function () {
+    expect(res.getStatus()).to.equal(200);
+    expect(res.getBody().message).to.be.a("string");
+  });
 }
 
 settings {
   encodeUrl: true
-  timeout: 0
+  timeout: 25000
 }

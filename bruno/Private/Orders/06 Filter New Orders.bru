@@ -1,0 +1,22 @@
+meta {
+  name: Filter New Orders
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{PRIVATE_BASE_URL}}/api/v1/admin/orders
+  body: none
+  auth: none
+}
+
+params:query {
+  page: 1
+  page_size: 20
+  status_filter: new
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

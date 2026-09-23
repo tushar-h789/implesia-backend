@@ -5,6 +5,7 @@ from sqlalchemy import ColumnElement, func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.exceptions import ConflictError, NotFoundError
+from app.models.order import Order
 from app.models.pricing import EngagementModel, PricingPackage, PricingPage
 from app.schemas.pricing import (
     EngagementModelCreate,
@@ -187,6 +188,11 @@ async def update_model(
 
 
 async def delete_model(db: AsyncSession, item: EngagementModel) -> None:
+    order_count = await db.scalar(
+        select(func.count()).select_from(Order).where(Order.model_id == item.id)
+    )
+    if order_count:
+        raise ConflictError("This model has orders. Cancel or reassign them before deleting.")
     await db.delete(item)
     await db.commit()
 
@@ -287,5 +293,10 @@ async def update_package(
 
 
 async def delete_package(db: AsyncSession, item: PricingPackage) -> None:
+    order_count = await db.scalar(
+        select(func.count()).select_from(Order).where(Order.package_id == item.id)
+    )
+    if order_count:
+        raise ConflictError("This package has orders. Cancel or reassign them before deleting.")
     await db.delete(item)
     await db.commit()

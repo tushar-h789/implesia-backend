@@ -10,8 +10,8 @@ Open this folder as a Bruno collection. Same layout as Flyger LMS `docs/`:
 ## Open in Bruno
 
 1. Bruno → **Open Collection**
-2. Select `/home/tushar/Desktop/office/practice/fast-api-backend/bruno`
-3. Environment = **Local**
+2. Select `/home/tushar/Desktop/office/practice/implesia/implesia-backend/bruno`
+3. Environment = **Local** (or **Production** for live public GETs)
 
 API must be running: `uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload`
 
@@ -33,7 +33,7 @@ These UUIDs already exist after seed. Use them for Get / List / Patch. Slug stay
 
 | Folder | Get / Update uses |
 |---|---|
-| Services | `SERVICE_ID` (`web-platforms`) |
+| Services | `SERVICE_ID` (`web-platforms`). Run **Public / Services / List Services** first — it copies the UUID from `SERVICE_SLUG`. A slug in the path is `422`. |
 | Pricing models | `MODEL_ID` (`discovery-sprint`) |
 | Pricing packages | `PACKAGE_ID` (`product-landing-page`) |
 | Portfolio | `PROJECT_ID` (`gulf-franchise`) |
@@ -51,7 +51,7 @@ Create writes a `DEMO_*_ID`. Delete uses that id, never the live catalogue.
 
 | Create | Then delete |
 |---|---|
-| Services → Create Service (`bruno-crud-service`) | Services → Delete Service |
+| Services → Create Service (`bruno-crud-service`) | Services → Get Demo → Update → Delete Service |
 | Pricing → Create Model (`bruno-demo-model`) | Pricing → Delete Model |
 | Pricing → Create Package (`bruno-demo-package`) | Pricing → Delete Package |
 | Portfolio → Create Project (`bruno-demo-case`) | Portfolio → Delete Project |

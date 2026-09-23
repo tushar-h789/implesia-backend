@@ -1,0 +1,35 @@
+meta {
+  name: Create Manual Order
+  type: http
+  seq: 7
+}
+
+post {
+  url: {{PRIVATE_BASE_URL}}/api/v1/admin/orders
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "service_id": "{{SERVICE_ID}}",
+    "full_name": "WhatsApp Lead",
+    "email": "lead@example.com",
+    "phone": "+8801516527932",
+    "organisation": "Call-in",
+    "message": "Logged from WhatsApp. They asked to start the web platforms service.",
+    "source_page": "whatsapp"
+  }
+}
+
+script:post-response {
+  const body = res.getBody();
+  if (res.getStatus() === 201 && body.id) {
+    bru.setEnvVar("ORDER_ID", body.id);
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

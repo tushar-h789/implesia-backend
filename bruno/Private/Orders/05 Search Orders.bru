@@ -1,0 +1,22 @@
+meta {
+  name: Search Orders
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{PRIVATE_BASE_URL}}/api/v1/admin/orders
+  body: none
+  auth: none
+}
+
+params:query {
+  page: 1
+  page_size: 20
+  search: acme
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

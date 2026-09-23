@@ -7,10 +7,42 @@ meta {
 get {
   url: {{PRIVATE_BASE_URL}}/api/v1/admin/services/{{SERVICE_ID}}
   body: none
-  auth: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{ACCESS_TOKEN}}
+}
+
+headers {
+  Accept: application/json
+}
+
+docs {
+  # GET /api/v1/admin/services/{id}
+
+  Seeded catalogue row (`SERVICE_ID`, usually `web-platforms`). Drafts are visible here.
+
+  Run **List Services** first if this 404s.
+
+  **Expected:** `200`
+}
+
+tests {
+  test("returns the admin service row", function () {
+    expect(res.getStatus()).to.equal(200);
+    const body = res.getBody();
+    expect(body.id).to.equal(bru.getEnvVar("SERVICE_ID"));
+    expect(body.process_steps).to.be.an("array");
+    expect(body.faqs).to.be.an("array");
+  });
+}
+
+assert {
+  res.status: eq 200
 }
 
 settings {
   encodeUrl: true
-  timeout: 0
+  timeout: 25000
 }
